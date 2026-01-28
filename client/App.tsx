@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import BrowseBoats from "./pages/BrowseBoats";
+import BookingFlow from "./pages/BookingFlow";
 import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
 
@@ -22,6 +23,7 @@ const App = () => (
         <Header />
         <Routes>
           <Route path="/" element={<BrowseBoats />} />
+          <Route path="/booking" element={<BookingFlow />} />
           <Route path="/search" element={<Placeholder />} />
           <Route path="/bookings" element={<Placeholder />} />
           <Route path="/membership" element={<Placeholder />} />
