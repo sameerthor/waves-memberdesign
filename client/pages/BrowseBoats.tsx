@@ -39,7 +39,8 @@ export default function BrowseBoats() {
       fuelCapacity: "55 gallons",
       capacity: "6 passengers / 1300 lbs",
       features: ["Fishing", "Pets Allowed", "Bimini"],
-      description: "Perfect for family outings and relaxed cruising. Easy to handle with a smooth ride, even in light chop",
+      description:
+        "Perfect for family outings and relaxed cruising. Easy to handle with a smooth ride, even in light chop",
       notes: "Great for sunset cruises",
       dockInstructions: "Slip 12A, near the fuel station. Key code: 4521",
       lastBooked: "December 15, 2025",

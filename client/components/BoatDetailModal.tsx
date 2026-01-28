@@ -1,4 +1,14 @@
-import { X, ChevronLeft, ChevronRight, MapPin, Ruler, Gauge, Fuel, Users, Info } from "lucide-react";
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  Ruler,
+  Gauge,
+  Fuel,
+  Users,
+  Info,
+} from "lucide-react";
 import { useState } from "react";
 
 interface BoatDetails {
@@ -28,7 +38,11 @@ interface BoatDetailModalProps {
   onClose: () => void;
 }
 
-export default function BoatDetailModal({ boat, isOpen, onClose }: BoatDetailModalProps) {
+export default function BoatDetailModal({
+  boat,
+  isOpen,
+  onClose,
+}: BoatDetailModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   if (!isOpen) return null;
@@ -38,7 +52,9 @@ export default function BoatDetailModal({ boat, isOpen, onClose }: BoatDetailMod
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + boat.images.length) % boat.images.length);
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + boat.images.length) % boat.images.length,
+    );
   };
 
   return (
@@ -51,7 +67,7 @@ export default function BoatDetailModal({ boat, isOpen, onClose }: BoatDetailMod
             alt={`${boat.name} - Image ${currentImageIndex + 1}`}
             className="w-full h-full object-cover"
           />
-          
+
           {/* Badge */}
           {boat.badge === "most-booked" && (
             <div className="absolute top-5 left-4 px-2 py-1 rounded-lg bg-green-badge text-white text-xs">
@@ -83,7 +99,9 @@ export default function BoatDetailModal({ boat, isOpen, onClose }: BoatDetailMod
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
-              <h2 className="text-gray-900 text-2xl font-semibold mb-1">{boat.name}</h2>
+              <h2 className="text-gray-900 text-2xl font-semibold mb-1">
+                {boat.name}
+              </h2>
               <div className="flex items-center gap-1.5 mb-1">
                 <span className="text-gray-900 text-sm">{boat.type}</span>
                 <span className="w-1 h-1 bg-gray-900 rounded-full"></span>
@@ -94,7 +112,9 @@ export default function BoatDetailModal({ boat, isOpen, onClose }: BoatDetailMod
 
             {boat.includedWithMembership && (
               <div className="px-2 py-1 rounded-lg border border-blue-primary/64 bg-blue-primary/11">
-                <span className="text-blue-primary text-xs">Member Booking - No Charge</span>
+                <span className="text-blue-primary text-xs">
+                  Member Booking - No Charge
+                </span>
               </div>
             )}
           </div>
@@ -106,38 +126,56 @@ export default function BoatDetailModal({ boat, isOpen, onClose }: BoatDetailMod
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
             <div className="flex flex-col items-center gap-1 p-4 bg-gray-50 rounded-lg">
               <MapPin className="w-[18px] h-[18px] text-blue-primary" />
-              <span className="text-gray-500 text-xs text-center">Location</span>
-              <span className="text-gray-900 text-sm font-medium text-center">{boat.location}</span>
+              <span className="text-gray-500 text-xs text-center">
+                Location
+              </span>
+              <span className="text-gray-900 text-sm font-medium text-center">
+                {boat.location}
+              </span>
             </div>
 
             <div className="flex flex-col items-center gap-1 p-4 bg-gray-50 rounded-lg">
               <Ruler className="w-[18px] h-[18px] text-blue-primary" />
               <span className="text-gray-500 text-xs text-center">Length</span>
-              <span className="text-gray-900 text-sm font-medium text-center">{boat.length}</span>
+              <span className="text-gray-900 text-sm font-medium text-center">
+                {boat.length}
+              </span>
             </div>
 
             <div className="flex flex-col items-center gap-1 p-4 bg-gray-50 rounded-lg">
               <Gauge className="w-[18px] h-[18px] text-blue-primary" />
               <span className="text-gray-500 text-xs text-center">Motor</span>
-              <span className="text-gray-900 text-sm font-medium text-center leading-tight">{boat.motor}</span>
+              <span className="text-gray-900 text-sm font-medium text-center leading-tight">
+                {boat.motor}
+              </span>
             </div>
 
             <div className="flex flex-col items-center gap-1 p-4 bg-gray-50 rounded-lg">
               <Fuel className="w-[18px] h-[18px] text-blue-primary" />
-              <span className="text-gray-500 text-xs text-center">Fuel Capacity</span>
-              <span className="text-gray-900 text-sm font-medium text-center">{boat.fuelCapacity}</span>
+              <span className="text-gray-500 text-xs text-center">
+                Fuel Capacity
+              </span>
+              <span className="text-gray-900 text-sm font-medium text-center">
+                {boat.fuelCapacity}
+              </span>
             </div>
 
             <div className="flex flex-col items-center gap-1 p-4 bg-gray-50 rounded-lg">
               <Users className="w-[18px] h-[18px] text-blue-primary" />
-              <span className="text-gray-500 text-xs text-center">Capacity</span>
-              <span className="text-gray-900 text-sm font-medium text-center leading-tight">{boat.capacity}</span>
+              <span className="text-gray-500 text-xs text-center">
+                Capacity
+              </span>
+              <span className="text-gray-900 text-sm font-medium text-center leading-tight">
+                {boat.capacity}
+              </span>
             </div>
           </div>
 
           {/* Features */}
           <div className="mb-6">
-            <h3 className="text-gray-900 text-base font-medium mb-4">Features</h3>
+            <h3 className="text-gray-900 text-base font-medium mb-4">
+              Features
+            </h3>
             <div className="flex flex-wrap items-center gap-2">
               {boat.features.map((feature) => (
                 <span
@@ -158,19 +196,25 @@ export default function BoatDetailModal({ boat, isOpen, onClose }: BoatDetailMod
 
           {/* Dock Instructions */}
           <div className="mb-6">
-            <h3 className="text-gray-900 text-base font-medium mb-2">Dock Instructions</h3>
+            <h3 className="text-gray-900 text-base font-medium mb-2">
+              Dock Instructions
+            </h3>
             <p className="text-gray-900 text-sm">{boat.dockInstructions}</p>
           </div>
 
           {/* Last Booked Section */}
           {boat.lastBooked && (
             <div className="p-5 border border-yellow-600 bg-yellow-600/9 rounded-lg mb-6">
-              <h3 className="text-gray-900 text-base font-medium mb-2">Last Booked by You</h3>
+              <h3 className="text-gray-900 text-base font-medium mb-2">
+                Last Booked by You
+              </h3>
               <p className="text-gray-500 text-sm mb-4">{boat.lastBooked}</p>
-              
+
               {boat.yourNotes && (
                 <>
-                  <h4 className="text-gray-900 text-base font-medium mb-2">Your Notes</h4>
+                  <h4 className="text-gray-900 text-base font-medium mb-2">
+                    Your Notes
+                  </h4>
                   <p className="text-gray-900 text-sm">{boat.yourNotes}</p>
                 </>
               )}
@@ -181,7 +225,8 @@ export default function BoatDetailModal({ boat, isOpen, onClose }: BoatDetailMod
           <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg mb-6">
             <Info className="w-5 h-5 text-blue-primary flex-shrink-0" />
             <p className="text-gray-500 text-xs">
-              No payment is required now. Fuel and usage charges will be billed after your trip.
+              No payment is required now. Fuel and usage charges will be billed
+              after your trip.
             </p>
           </div>
 
