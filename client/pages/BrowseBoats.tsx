@@ -179,11 +179,24 @@ export default function BrowseBoats() {
           {/* Boat List */}
           <div className="flex flex-col gap-5">
             {boats.map((boat, index) => (
-              <BoatCard key={`${boat.id}-${index}`} {...boat} />
+              <BoatCard
+                key={`${boat.id}-${index}`}
+                {...boat}
+                onSelectBoat={() => handleSelectBoat(boat)}
+              />
             ))}
           </div>
         </div>
       </main>
+
+      {/* Boat Detail Modal */}
+      {selectedBoat && (
+        <BoatDetailModal
+          boat={selectedBoat}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }
