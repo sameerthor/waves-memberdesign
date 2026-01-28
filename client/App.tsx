@@ -10,6 +10,7 @@ import Header from "./components/Header";
 import BrowseBoats from "./pages/BrowseBoats";
 import BookingFlow from "./pages/BookingFlow";
 import MyBookings from "./pages/MyBookings";
+import Search from "./pages/Search";
 import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
 
@@ -25,7 +26,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<BrowseBoats />} />
           <Route path="/booking" element={<BookingFlow />} />
-          <Route path="/search" element={<Placeholder />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/bookings" element={<MyBookings />} />
           <Route path="/membership" element={<Placeholder />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
