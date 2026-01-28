@@ -115,6 +115,7 @@ export default function BoatCard({
             View Details
           </button>
           <button
+            onClick={onSelectBoat}
             className="flex-1 py-3 px-4 bg-blue-primary text-white font-semibold text-base rounded-md hover:bg-blue-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={badge === "unavailable"}
           >
