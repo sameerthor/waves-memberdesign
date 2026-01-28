@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import BrowseBoats from "./pages/BrowseBoats";
+import BookingPage from "./pages/BookingPage";
 import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
 
