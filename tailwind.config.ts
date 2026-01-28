@@ -57,6 +57,23 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        blue: {
+          DEFAULT: "#2948FF",
+          primary: "#2948FF",
+        },
+        gray: {
+          50: "#F3F4F6",
+          100: "#EAEDF1",
+          200: "#EEE",
+          500: "#6C757D",
+          900: "#212529",
+        },
+        green: {
+          badge: "#22C55E",
+        },
+        red: {
+          badge: "#EF4444",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
