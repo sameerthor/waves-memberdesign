@@ -10,6 +10,7 @@ import {
   Info,
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface BoatDetails {
   id: string;
@@ -44,8 +45,13 @@ export default function BoatDetailModal({
   onClose,
 }: BoatDetailModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
+
+  const handleSelectBoat = () => {
+    navigate("/booking", { state: { boat } });
+  };
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % boat.images.length);
@@ -235,7 +241,10 @@ export default function BoatDetailModal({
             <button className="flex-1 py-3 px-4 border border-gray-500 text-gray-500 font-semibold text-base rounded-md hover:bg-gray-50 transition-colors">
               View Details
             </button>
-            <button className="flex-1 py-3 px-4 bg-blue-primary text-white font-semibold text-base rounded-md hover:bg-blue-primary/90 transition-colors">
+            <button
+              onClick={handleSelectBoat}
+              className="flex-1 py-3 px-4 bg-blue-primary text-white font-semibold text-base rounded-md hover:bg-blue-primary/90 transition-colors"
+            >
               Select Boat
             </button>
           </div>
