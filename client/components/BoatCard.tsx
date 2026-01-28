@@ -31,6 +31,7 @@ export default function BoatCard({
   pricePerHour,
   badge,
   includedWithMembership,
+  onSelectBoat,
 }: BoatCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col lg:flex-row gap-5 p-5 relative">
