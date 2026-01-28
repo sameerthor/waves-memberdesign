@@ -3,7 +3,7 @@ import { User } from "lucide-react";
 
 export default function Header() {
   return (
-    <header className="w-full h-[78px] bg-white border-b border-gray-500/25 flex items-center justify-between px-10">
+    <header className="w-full h-[78px] bg-white border-b border-gray-500/25 flex items-center justify-between px-4 md:px-6 lg:px-10">
       <Link to="/" className="flex-shrink-0">
         <img 
           src="https://api.builder.io/api/v1/image/assets/TEMP/9b9b095f93ea45803cfc60cf88ccfe90fbf02d5f?width=270" 
@@ -12,7 +12,7 @@ export default function Header() {
         />
       </Link>
       
-      <nav className="flex items-center gap-6">
+      <nav className="hidden md:flex items-center gap-4 lg:gap-6">
         <Link 
           to="/search" 
           className="text-gray-900 font-medium text-base hover:text-blue-primary transition-colors"
@@ -39,7 +39,7 @@ export default function Header() {
         </Link>
       </nav>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 md:gap-3">
         <div className="text-right">
           <div className="text-gray-900 font-semibold text-sm">John Doe</div>
           <div className="text-gray-500 text-xs">Platinum Member</div>

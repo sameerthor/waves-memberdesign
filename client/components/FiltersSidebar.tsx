@@ -7,7 +7,7 @@ export default function FiltersSidebar() {
   const [boatLength, setBoatLength] = useState([18, 26]);
 
   return (
-    <aside className="w-[365px] bg-white rounded-md p-7 flex flex-col gap-4 h-fit sticky top-5">
+    <aside className="w-full lg:w-[365px] bg-white rounded-md p-5 lg:p-7 flex flex-col gap-4 h-fit lg:sticky lg:top-5">
       <Calendar />
 
       {/* Location */}

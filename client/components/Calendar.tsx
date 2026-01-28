@@ -60,12 +60,12 @@ export default function Calendar() {
           <div key={day} className="aspect-square flex items-center justify-center">
             <button
               className={`
-                w-8 h-8 rounded-md flex items-center justify-center text-sm font-normal
-                ${selected 
-                  ? "bg-blue-primary text-white font-semibold" 
-                  : available 
-                    ? "bg-red-500 text-white" 
-                    : "text-gray-900 hover:bg-gray-100"
+                w-8 h-8 rounded-md flex items-center justify-center text-sm
+                ${selected
+                  ? "bg-blue-primary text-white font-semibold"
+                  : available
+                    ? "bg-red-500 text-white font-normal"
+                    : "text-gray-900 hover:bg-gray-100 font-normal"
                 }
                 transition-colors
               `}
