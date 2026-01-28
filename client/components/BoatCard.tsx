@@ -14,6 +14,7 @@ interface BoatCardProps {
   pricePerHour?: number;
   badge?: "most-booked" | "unavailable" | null;
   includedWithMembership?: boolean;
+  onSelectBoat?: () => void;
 }
 
 export default function BoatCard({
