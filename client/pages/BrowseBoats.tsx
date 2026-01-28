@@ -1,8 +1,23 @@
 import { Search, ArrowUpDown } from "lucide-react";
+import { useState } from "react";
 import BoatCard from "@/components/BoatCard";
 import FiltersSidebar from "@/components/FiltersSidebar";
+import BoatDetailModal from "@/components/BoatDetailModal";
 
 export default function BrowseBoats() {
+  const [selectedBoat, setSelectedBoat] = useState<any | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleSelectBoat = (boat: any) => {
+    setSelectedBoat(boat);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedBoat(null), 300);
+  };
+
   const boats = [
     {
       id: "BO01",
