@@ -75,7 +75,7 @@ export default function BookingDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[90vw] md:max-w-[616px] max-h-[90vh] overflow-y-auto p-6">
+      <DialogContent className="max-w-[90vw] md:max-w-[616px] max-h-[90vh] overflow-y-auto p-6 [&>button]:hidden">
         {currentStep === "details" && (
           <BookingDetailsStep boat={boat} onContinue={handleContinue} />
         )}
