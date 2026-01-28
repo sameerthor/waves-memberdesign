@@ -23,6 +23,7 @@ const App = () => (
         <Header />
         <Routes>
           <Route path="/" element={<BrowseBoats />} />
+          <Route path="/booking/:boatId" element={<BookingPage />} />
           <Route path="/search" element={<Placeholder />} />
           <Route path="/bookings" element={<Placeholder />} />
           <Route path="/membership" element={<Placeholder />} />
