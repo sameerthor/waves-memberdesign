@@ -1,4 +1,6 @@
 import { MapPin, Sailboat, Ruler, Users } from "lucide-react";
+import { useState } from "react";
+import BookingDialog from "./BookingDialog";
 
 interface BoatCardProps {
   id: string;
@@ -31,7 +33,10 @@ export default function BoatCard({
   badge,
   includedWithMembership,
 }: BoatCardProps) {
+  const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+
   return (
+    <>
     <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col lg:flex-row gap-5 p-5 relative">
       {/* Image */}
       <div className="relative w-full lg:w-[218px] h-[218px] flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
@@ -113,6 +118,7 @@ export default function BoatCard({
             View Details
           </button>
           <button
+            onClick={() => setBookingDialogOpen(true)}
             className="flex-1 py-3 px-4 bg-blue-primary text-white font-semibold text-base rounded-md hover:bg-blue-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={badge === "unavailable"}
           >
@@ -121,5 +127,21 @@ export default function BoatCard({
         </div>
       </div>
     </div>
+
+    <BookingDialog
+      open={bookingDialogOpen}
+      onOpenChange={setBookingDialogOpen}
+      boat={{
+        id,
+        name,
+        type,
+        category,
+        image,
+        location,
+        guests,
+        includedWithMembership,
+      }}
+    />
+    </>
   );
 }
