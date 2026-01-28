@@ -42,7 +42,7 @@ export default function BookingFlow() {
 
   // Generate random booking ID
   const [bookingId] = useState(
-    `WB-${Math.floor(100000 + Math.random() * 900000)}`
+    `WB-${Math.floor(100000 + Math.random() * 900000)}`,
   );
 
   if (!boat) {
@@ -52,7 +52,7 @@ export default function BookingFlow() {
 
   const handleInputChange = (
     field: keyof BookingData,
-    value: string | "yes" | "no"
+    value: string | "yes" | "no",
   ) => {
     setBookingData((prev) => {
       const updated = { ...prev, [field]: value };
@@ -557,9 +557,7 @@ export default function BookingFlow() {
                 <h2 className="text-gray-900 text-2xl font-bold mb-4">
                   Booking Confirmed!
                 </h2>
-                <p className="text-gray-500 text-base">
-                  Your adventure awaits
-                </p>
+                <p className="text-gray-500 text-base">Your adventure awaits</p>
               </div>
 
               {/* Booking Details Card */}
