@@ -15,37 +15,37 @@ export default function FiltersSidebar() {
         <h3 className="text-gray-900 font-semibold text-base mb-3">Location</h3>
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="all-locations" 
-              defaultChecked 
+            <Checkbox
+              id="all-locations"
+              defaultChecked
               className="w-[18px] h-[18px] rounded border-gray-500/25 data-[state=checked]:bg-blue-primary data-[state=checked]:border-blue-primary"
             />
-            <label 
-              htmlFor="all-locations" 
+            <label
+              htmlFor="all-locations"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               All Locations
             </label>
           </div>
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="phillippi" 
+            <Checkbox
+              id="phillippi"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="phillippi" 
+            <label
+              htmlFor="phillippi"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Phillippi Harbor Club
             </label>
           </div>
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="sarasota" 
+            <Checkbox
+              id="sarasota"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="sarasota" 
+            <label
+              htmlFor="sarasota"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Sarasota Bay
@@ -56,52 +56,54 @@ export default function FiltersSidebar() {
 
       {/* Boat Type */}
       <div className="pt-4 border-t border-gray-500/25">
-        <h3 className="text-gray-900 font-semibold text-base mb-3">Boat Type</h3>
+        <h3 className="text-gray-900 font-semibold text-base mb-3">
+          Boat Type
+        </h3>
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="all-boat-types" 
-              defaultChecked 
+            <Checkbox
+              id="all-boat-types"
+              defaultChecked
               className="w-[18px] h-[18px] rounded border-gray-500/25 data-[state=checked]:bg-blue-primary data-[state=checked]:border-blue-primary"
             />
-            <label 
-              htmlFor="all-boat-types" 
+            <label
+              htmlFor="all-boat-types"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               All Boat Types
             </label>
           </div>
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="deck-boat" 
+            <Checkbox
+              id="deck-boat"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="deck-boat" 
+            <label
+              htmlFor="deck-boat"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Deck Boat
             </label>
           </div>
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="bowrider" 
+            <Checkbox
+              id="bowrider"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="bowrider" 
+            <label
+              htmlFor="bowrider"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Bowrider
             </label>
           </div>
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="center-console" 
+            <Checkbox
+              id="center-console"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="center-console" 
+            <label
+              htmlFor="center-console"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Center Console
@@ -121,8 +123,8 @@ export default function FiltersSidebar() {
             <span>Min</span>
             <span className="ml-auto">{boatLength[0]}'</span>
           </div>
-          <Slider 
-            value={boatLength} 
+          <Slider
+            value={boatLength}
             onValueChange={setBoatLength}
             min={16}
             max={30}
@@ -146,72 +148,72 @@ export default function FiltersSidebar() {
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="fishing-permitted" 
+            <Checkbox
+              id="fishing-permitted"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="fishing-permitted" 
+            <label
+              htmlFor="fishing-permitted"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Fishing Permitted
             </label>
           </div>
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="livewell" 
+            <Checkbox
+              id="livewell"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="livewell" 
+            <label
+              htmlFor="livewell"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Livewell
             </label>
           </div>
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="offshore-use" 
+            <Checkbox
+              id="offshore-use"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="offshore-use" 
+            <label
+              htmlFor="offshore-use"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Offshore Use
             </label>
           </div>
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="watersports" 
+            <Checkbox
+              id="watersports"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="watersports" 
+            <label
+              htmlFor="watersports"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Watersports
             </label>
           </div>
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="bimini" 
+            <Checkbox
+              id="bimini"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="bimini" 
+            <label
+              htmlFor="bimini"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Bimini
             </label>
           </div>
           <div className="flex items-center gap-2.5">
-            <Checkbox 
-              id="pets-allowed" 
+            <Checkbox
+              id="pets-allowed"
               className="w-[18px] h-[18px] rounded border-gray-500/25"
             />
-            <label 
-              htmlFor="pets-allowed" 
+            <label
+              htmlFor="pets-allowed"
               className="text-gray-900 text-sm font-medium cursor-pointer"
             >
               Pets Allowed

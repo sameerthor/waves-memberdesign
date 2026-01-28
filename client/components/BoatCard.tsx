@@ -36,19 +36,17 @@ export default function BoatCard({
       {/* Image */}
       <div className="relative w-full lg:w-[218px] h-[218px] flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
         {badge && (
-          <div className={`absolute top-2 left-2 px-2 py-1 rounded-md text-xs font-medium ${
-            badge === "most-booked" 
-              ? "bg-green-badge text-white" 
-              : "bg-red-badge text-white"
-          }`}>
+          <div
+            className={`absolute top-2 left-2 px-2 py-1 rounded-md text-xs font-medium ${
+              badge === "most-booked"
+                ? "bg-green-badge text-white"
+                : "bg-red-badge text-white"
+            }`}
+          >
             {badge === "most-booked" ? "Most Booked" : "Unavailable"}
           </div>
         )}
-        <img 
-          src={image} 
-          alt={name} 
-          className="w-full h-full object-cover"
-        />
+        <img src={image} alt={name} className="w-full h-full object-cover" />
       </div>
 
       {/* Content */}
@@ -101,8 +99,8 @@ export default function BoatCard({
 
         <div className="flex flex-wrap items-center gap-2 mb-4">
           {features.map((feature) => (
-            <span 
-              key={feature} 
+            <span
+              key={feature}
               className="px-2 py-1 rounded-lg bg-gray-200 text-gray-900 text-xs"
             >
               {feature}
@@ -114,7 +112,7 @@ export default function BoatCard({
           <button className="flex-1 py-3 px-4 border border-gray-500 text-gray-500 font-semibold text-base rounded-md hover:bg-gray-50 transition-colors">
             View Details
           </button>
-          <button 
+          <button
             className="flex-1 py-3 px-4 bg-blue-primary text-white font-semibold text-base rounded-md hover:bg-blue-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={badge === "unavailable"}
           >

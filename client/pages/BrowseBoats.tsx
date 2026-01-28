@@ -9,7 +9,8 @@ export default function BrowseBoats() {
       name: "Sea Breeze",
       type: "Hurricane",
       category: "Deck Boat",
-      image: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&h=600&fit=crop",
       location: "Marina Bay",
       boatType: "Yacht",
       length: "42 ft",
@@ -23,7 +24,8 @@ export default function BrowseBoats() {
       name: "Ocean Explorer",
       type: "Hurricane",
       category: "Deck Boat",
-      image: "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=800&h=600&fit=crop",
       location: "Marina Bay",
       boatType: "Yacht",
       length: "42 ft",
@@ -36,7 +38,8 @@ export default function BrowseBoats() {
       name: "Sea Breeze",
       type: "Hurricane",
       category: "Deck Boat",
-      image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&h=600&fit=crop",
       location: "Marina Bay",
       boatType: "Yacht",
       length: "42 ft",
@@ -50,7 +53,8 @@ export default function BrowseBoats() {
       name: "Sea Breeze",
       type: "Hurricane",
       category: "Deck Boat",
-      image: "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=800&h=600&fit=crop",
       location: "Marina Bay",
       boatType: "Yacht",
       length: "42 ft",
@@ -63,7 +67,8 @@ export default function BrowseBoats() {
       name: "Sea Breeze",
       type: "Hurricane",
       category: "Deck Boat",
-      image: "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&h=600&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?w=800&h=600&fit=crop",
       location: "Marina Bay",
       boatType: "Yacht",
       length: "42 ft",

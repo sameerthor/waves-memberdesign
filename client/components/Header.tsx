@@ -5,34 +5,31 @@ export default function Header() {
   return (
     <header className="w-full h-[78px] bg-white border-b border-gray-500/25 flex items-center justify-between px-4 md:px-6 lg:px-10">
       <Link to="/" className="flex-shrink-0">
-        <img 
-          src="https://api.builder.io/api/v1/image/assets/TEMP/9b9b095f93ea45803cfc60cf88ccfe90fbf02d5f?width=270" 
-          alt="WAV List" 
+        <img
+          src="https://api.builder.io/api/v1/image/assets/TEMP/9b9b095f93ea45803cfc60cf88ccfe90fbf02d5f?width=270"
+          alt="WAV List"
           className="h-12 w-auto"
         />
       </Link>
-      
+
       <nav className="hidden md:flex items-center gap-4 lg:gap-6">
-        <Link 
-          to="/search" 
+        <Link
+          to="/search"
           className="text-gray-900 font-medium text-base hover:text-blue-primary transition-colors"
         >
           Search
         </Link>
-        <Link 
-          to="/" 
-          className="text-blue-primary font-bold text-base"
-        >
+        <Link to="/" className="text-blue-primary font-bold text-base">
           Browse Boats
         </Link>
-        <Link 
-          to="/bookings" 
+        <Link
+          to="/bookings"
           className="text-gray-900 font-medium text-base hover:text-blue-primary transition-colors"
         >
           My Bookings
         </Link>
-        <Link 
-          to="/membership" 
+        <Link
+          to="/membership"
           className="text-gray-900 font-medium text-base hover:text-blue-primary transition-colors"
         >
           Membership
