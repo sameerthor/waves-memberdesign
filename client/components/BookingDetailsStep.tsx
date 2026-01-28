@@ -31,17 +31,20 @@ export default function BookingDetailsStep({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    
+
     const bookingData: BookingFormData = {
       date: formData.get("date") as string,
       startTime: formData.get("startTime") as string,
       duration: formData.get("duration") as string,
       endTime: formData.get("endTime") as string,
       destination: formData.get("destination") as string,
-      driverRequired: formData.get("driverRequired") as "yes" | "no-driver" | "provide-driver",
+      driverRequired: formData.get("driverRequired") as
+        | "yes"
+        | "no-driver"
+        | "provide-driver",
       notes: formData.get("notes") as string,
     };
-    
+
     onContinue(bookingData);
   };
 
@@ -50,8 +53,20 @@ export default function BookingDetailsStep({
       {/* Header with Back Button */}
       <div className="flex items-center gap-2">
         <button className="text-gray-900 text-sm flex items-center gap-1 hover:text-gray-700">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 13L5 8L10 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10 13L5 8L10 3"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
           <span className="font-medium">Booking Details</span>
         </button>
@@ -83,16 +98,44 @@ export default function BookingDetailsStep({
           </div>
           <div className="text-gray-500 text-xs mt-1">{boat.id}</div>
           <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 9.75C10.2426 9.75 11.25 8.74264 11.25 7.5C11.25 6.25736 10.2426 5.25 9 5.25C7.75736 5.25 6.75 6.25736 6.75 7.5C6.75 8.74264 7.75736 9.75 9 9.75Z" stroke="currentColor" strokeWidth="1.5"/>
-              <path d="M14.25 7.5C14.25 12 9 16.5 9 16.5C9 16.5 3.75 12 3.75 7.5C3.75 4.59837 6.09837 2.25 9 2.25C11.9016 2.25 14.25 4.59837 14.25 7.5Z" stroke="currentColor" strokeWidth="1.5"/>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 9.75C10.2426 9.75 11.25 8.74264 11.25 7.5C11.25 6.25736 10.2426 5.25 9 5.25C7.75736 5.25 6.75 6.25736 6.75 7.5C6.75 8.74264 7.75736 9.75 9 9.75Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M14.25 7.5C14.25 12 9 16.5 9 16.5C9 16.5 3.75 12 3.75 7.5C3.75 4.59837 6.09837 2.25 9 2.25C11.9016 2.25 14.25 4.59837 14.25 7.5Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
             </svg>
             <span>{boat.location}</span>
           </div>
           <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 12.75C13.2426 12.75 14.25 11.7426 14.25 10.5C14.25 9.25736 13.2426 8.25 12 8.25C10.7574 8.25 9.75 9.25736 9.75 10.5C9.75 11.7426 10.7574 12.75 12 12.75Z" stroke="currentColor" strokeWidth="1.5"/>
-              <path d="M6 12.75C7.24264 12.75 8.25 11.7426 8.25 10.5C8.25 9.25736 7.24264 8.25 6 8.25C4.75736 8.25 3.75 9.25736 3.75 10.5C3.75 11.7426 4.75736 12.75 6 12.75Z" stroke="currentColor" strokeWidth="1.5"/>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 12.75C13.2426 12.75 14.25 11.7426 14.25 10.5C14.25 9.25736 13.2426 8.25 12 8.25C10.7574 8.25 9.75 9.25736 9.75 10.5C9.75 11.7426 10.7574 12.75 12 12.75Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M6 12.75C7.24264 12.75 8.25 11.7426 8.25 10.5C8.25 9.25736 7.24264 8.25 6 8.25C4.75736 8.25 3.75 9.25736 3.75 10.5C3.75 11.7426 4.75736 12.75 6 12.75Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
             </svg>
             <span>{boat.guests} Guests</span>
           </div>
@@ -112,7 +155,7 @@ export default function BookingDetailsStep({
           <h3 className="text-gray-900 font-semibold text-base mb-4">
             Select Date & Time
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-gray-900 text-sm font-medium mb-2">
@@ -236,7 +279,9 @@ export default function BookingDetailsStep({
                   value="provide-driver"
                   className="w-4 h-4 text-blue-primary focus:ring-blue-primary"
                 />
-                <span className="text-gray-900 text-sm">Yes, provide driver</span>
+                <span className="text-gray-900 text-sm">
+                  Yes, provide driver
+                </span>
               </label>
             </div>
           </div>

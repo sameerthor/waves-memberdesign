@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import BookingDetailsStep from "./BookingDetailsStep";
 import BookingSummaryStep from "./BookingSummaryStep";
 import BookingConfirmation from "./BookingConfirmation";

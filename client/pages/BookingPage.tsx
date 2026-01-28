@@ -7,22 +7,24 @@ import { BookingFormData } from "@/components/BookingDetailsStep";
 
 // Mock boat data - in a real app, this would come from props or API
 const mockBoats: Record<string, any> = {
-  "B001": {
+  B001: {
     id: "B001",
     name: "Sea Breeze",
     type: "Hurricane - Deck Boat",
     category: "Deck Boat",
-    image: "https://api.builder.io/api/v1/image/assets/TEMP/9b9b095f93ea45803cfc60cf88ccfe90fbf02d5f?width=270",
+    image:
+      "https://api.builder.io/api/v1/image/assets/TEMP/9b9b095f93ea45803cfc60cf88ccfe90fbf02d5f?width=270",
     location: "Marina Bay",
     guests: 8,
     includedWithMembership: true,
   },
-  "B002": {
+  B002: {
     id: "B002",
     name: "Ocean Explorer",
     type: "Hurricane - Deck Boat",
     category: "Deck Boat",
-    image: "https://api.builder.io/api/v1/image/assets/TEMP/9b9b095f93ea45803cfc60cf88ccfe90fbf02d5f?width=270",
+    image:
+      "https://api.builder.io/api/v1/image/assets/TEMP/9b9b095f93ea45803cfc60cf88ccfe90fbf02d5f?width=270",
     location: "Marina Bay",
     guests: 8,
     includedWithMembership: false,
