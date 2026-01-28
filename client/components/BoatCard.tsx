@@ -1,4 +1,4 @@
-import { MapPin, Anchor, Ruler, Users } from "lucide-react";
+import { MapPin, Sailboat, Ruler, Users } from "lucide-react";
 
 interface BoatCardProps {
   id: string;
@@ -86,7 +86,7 @@ export default function BoatCard({
             <span>{location}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Anchor className="w-[18px] h-[18px]" />
+            <Sailboat className="w-[18px] h-[18px]" />
             <span>{boatType}</span>
           </div>
           <div className="flex items-center gap-1">
