@@ -1,5 +1,12 @@
 import { Link } from "react-router-dom";
-import { User } from "lucide-react";
+import { User, UserCircle, LogOut } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   return (
@@ -36,15 +43,39 @@ export default function Header() {
         </Link>
       </nav>
 
-      <div className="flex items-center gap-2 md:gap-3">
-        <div className="text-right">
-          <div className="text-gray-900 font-semibold text-sm">John Doe</div>
-          <div className="text-gray-500 text-xs">Platinum Member</div>
-        </div>
-        <div className="w-10 h-10 rounded-full bg-blue-primary flex items-center justify-center">
-          <User className="w-6 h-6 text-white" />
-        </div>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="flex items-center gap-2 md:gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+            <div className="text-right">
+              <div className="text-gray-900 font-semibold text-sm">
+                John Doe
+              </div>
+              <div className="text-gray-500 text-xs">Platinum Member</div>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-blue-primary flex items-center justify-center">
+              <User className="w-6 h-6 text-white" />
+            </div>
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuItem asChild>
+            <Link
+              to="/profile"
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <UserCircle className="w-4 h-4" />
+              <span>My Profile</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link to="/logout" className="flex items-center gap-2 cursor-pointer">
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 }
