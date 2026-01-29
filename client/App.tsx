@@ -12,6 +12,7 @@ import BookingFlow from "./pages/BookingFlow";
 import MyBookings from "./pages/MyBookings";
 import Search from "./pages/Search";
 import Profile from "./pages/Profile";
+import Login from "./pages/Login";
 import Logout from "./pages/Logout";
 import Placeholder from "./pages/Placeholder";
 import NotFound from "./pages/NotFound";
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/search" element={<Search />} />
           <Route path="/bookings" element={<MyBookings />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="/membership" element={<Placeholder />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
