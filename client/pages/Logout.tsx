@@ -9,7 +9,7 @@ export default function Logout() {
     // Simulate logout process
     const timer = setTimeout(() => {
       // In a real app, you would clear auth tokens, etc.
-      navigate("/");
+      navigate("/login");
     }, 2000);
 
     return () => clearTimeout(timer);
