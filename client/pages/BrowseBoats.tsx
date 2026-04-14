@@ -11,6 +11,10 @@ import { Button } from "@/components/ui/button";
 const MIN_LENGTH = 16;
 const MAX_LENGTH = 100;
 
+const getTodayDate = () => {
+  return new Date().toISOString().split("T")[0];
+};
+
 type SortOption =
   | "Recommended"
   | "Boat Length: High to Low"
@@ -34,7 +38,7 @@ export default function BrowseBoats() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+const [selectedDate, setSelectedDate] = useState<string | null>(getTodayDate());
   const [slot, setSlot] = useState<string | null>(null);
   const [locations, setLocations] = useState<string[]>([]);
   const [boatTypes, setBoatTypes] = useState<string[]>([]);
@@ -182,7 +186,7 @@ export default function BrowseBoats() {
 
   const handleResetFilters = () => {
     setSearchQuery("");
-    setSelectedDate(null);
+setSelectedDate(getTodayDate());
     setSlot(null);
     setLocations([]);
     setBoatTypes([]);
@@ -337,24 +341,49 @@ export default function BrowseBoats() {
           {!isLoading && boats.length > 0 && (
             <div className="flex flex-col gap-5">
               {boats.map((boat: any) => (
-                <BoatCard
-                  key={boat.id}
-                  id={boat.id}
-                  name={boat.boat_name}
-                  type={boat.type}
-                  category={boat.category}
-                  image={boat.image || ""}
-                  location={boat.location}
-                  boatType={boat.boatType}
-                  length={boat.length}
-                  guests={boat.capacity}
-                  features={boat.features}
-                  pricePerHour={boat.fare}
-                  badge={boat.badge}
-                  includedWithMembership={boat.includedWithMembership}
-                  onViewBoat={() => handleViewBoat(boat)}
-                  onSelectBoat={() => handleDirectSelectBoat(boat)}
-                />
+<BoatCard
+  key={boat.id}
+  id={boat.id}
+  name={boat.boat_name}
+  type={boat.type}
+  category={boat.category}
+
+  image={boat.image || ""}
+  images={boat.images || []}
+
+  location={boat.location}
+  boatType={boat.boatType}
+
+  length={boat.length}
+  guests={boat.capacity}
+
+  features={boat.features || []}
+
+  pricePerHour={boat.fare}
+
+  badge={boat.badge}
+
+  fuelCapacity={boat.fuelCapacity}
+  weightCapacity={boat.weightCapacity}
+  motor={boat.motor}
+
+  notes={boat.notes}
+  boatAddress={boat.boat_address}
+
+  lastBooked={boat.lastBooked}
+  lastBookedFormatted={boat.lastBookedFormatted}
+
+  availability={boat.availability}
+
+  onViewBoat={() => handleViewBoat(boat)}
+
+  onSelectBoat={() =>
+    handleDirectSelectBoat({
+      ...boat,
+      selectedDate: selectedDate    // 🔥 AM / PM / FULL_DAY
+    })
+  }
+/>
               ))}
             </div>
           )}

@@ -30,7 +30,6 @@ interface BoatCardProps {
 
   pricePerHour?: number | null;
   badge?: "most-booked" | "unavailable" | null;
-  includedWithMembership?: boolean;
 
   fuelCapacity?: string | number | null;
   weightCapacity?: string | number | null;
@@ -151,7 +150,6 @@ export default function BoatCard({
   features = [],
   pricePerHour,
   badge,
-  includedWithMembership,
   fuelCapacity,
   weightCapacity,
   motor,
@@ -163,6 +161,7 @@ export default function BoatCard({
   onSelectBoat,
   onViewBoat,
 }: BoatCardProps) {
+  console.log("availability",availability)
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
 
   const galleryImages = useMemo(() => {
@@ -272,17 +271,6 @@ export default function BoatCard({
           <div>
             <h3 className="text-gray-900 text-[26px] font-semibold">{name}</h3>
 
-            {(type || category) && (
-              <div className="flex items-center gap-1 mt-1">
-                {type && <span className="text-gray-900 text-xs">{type}</span>}
-                {type && category && (
-                  <span className="w-0.5 h-0.5 bg-gray-900 rounded-full"></span>
-                )}
-                {category && (
-                  <span className="text-gray-900 text-xs">{category}</span>
-                )}
-              </div>
-            )}
           </div>
 
           {pricePerHour !== null && pricePerHour !== undefined && (
@@ -322,13 +310,7 @@ export default function BoatCard({
             </span>
           </div>
 
-          {includedWithMembership && (
-            <div className="px-2 py-1 rounded-lg border border-blue-primary/64 bg-blue-primary/11">
-              <span className="text-blue-primary text-xs font-normal">
-                Included with Membership
-              </span>
-            </div>
-          )}
+
         </div>
 
         <div className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-4 mb-3 mt-3">
@@ -569,14 +551,6 @@ export default function BoatCard({
           </div>
 
           <div className="flex w-full sm:w-auto gap-3">
-            <button
-              onClick={onViewBoat}
-              className="flex-1 sm:flex-none sm:min-w-[140px] py-3 px-4 border border-blue-primary text-blue-primary font-semibold text-base rounded-md hover:bg-blue-primary/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={badge === "unavailable"}
-            >
-              View Boat
-            </button>
-
             <button
               onClick={onSelectBoat}
               className="flex-1 sm:flex-none sm:min-w-[180px] py-3 px-4 bg-blue-primary text-white font-semibold text-base rounded-md hover:bg-blue-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

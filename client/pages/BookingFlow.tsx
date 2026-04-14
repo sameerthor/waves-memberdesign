@@ -892,43 +892,7 @@ export default function BookingFlow() {
                       )}
                     </div>
 
-                    <div className="space-y-2 mt-5">
-                      <Label
-                        htmlFor="destination"
-                        className="text-[#171A22] text-[14px] font-semibold"
-                      >
-                        Destination
-                      </Label>
-
-                      {destinations.isLoading ? (
-                        <div className="h-11 bg-gray-100 rounded-lg animate-pulse" />
-                      ) : (
-                        <Select
-                          value={bookingData.destination || "__none__"}
-                          onValueChange={(value) =>
-                            handleInputChange(
-                              "destination",
-                              value === "__none__" ? "" : value,
-                            )
-                          }
-                        >
-                          <SelectTrigger
-                            id="destination"
-                            className="h-11 bg-white border-gray-300 rounded-lg text-[14px]"
-                          >
-                            <SelectValue placeholder="Select destination" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="__none__">Not specified</SelectItem>
-                            {destinations.data?.data?.map((destination) => (
-                              <SelectItem key={destination.id} value={destination.id}>
-                                {destination.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </div>
+                 
                   </div>
                 </div>
 

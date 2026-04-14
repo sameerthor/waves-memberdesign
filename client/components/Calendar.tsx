@@ -56,7 +56,7 @@ export default function Calendar({
   const daysInMonth = getDaysInMonth(currentMonth);
   const firstDay = getFirstDayOfMonth(currentMonth);
 
-  const availabilityDays = calendarData?.data?.days || [];
+  const availabilityDays = calendarData?.days || [];
 
   const calendarDays: (CalendarDay | null)[] = [];
 
