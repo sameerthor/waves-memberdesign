@@ -11,6 +11,21 @@ import { Button } from "@/components/ui/button";
 const MIN_LENGTH = 16;
 const MAX_LENGTH = 100;
 
+type SortOption =
+  | "Recommended"
+  | "Boat Length: High to Low"
+  | "Boat Length: Low to High"
+  | "Capacity: High to Low"
+  | "Capacity: Low to High";
+
+const SORT_OPTIONS: SortOption[] = [
+  "Recommended",
+  "Boat Length: High to Low",
+  "Boat Length: Low to High",
+  "Capacity: High to Low",
+  "Capacity: Low to High",
+];
+
 export default function BrowseBoats() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -28,39 +43,16 @@ export default function BrowseBoats() {
     MAX_LENGTH,
   ]);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+
   const [sortBy, setSortBy] = useState<string>("created_at");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
   const [hasSearchParams, setHasSearchParams] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState("Recommended");
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [selectedSortLabel, setSelectedSortLabel] =
+    useState<SortOption>("Recommended");
 
-  const dropdownRef = useRef(null);
-
-  const options = [
-    "Recommended",
-    "Boat Length: High to Low",
-    "Boat Length: Low to High",
-    "Capacity: High to Low",
-    "Capacity: Low to High",
-  ];
-
-  const toggleSortMenu = () => setIsOpen((prev) => !prev);
-
-  const handleSelect = (option) => {
-    setSelected(option);
-    setIsOpen(false);
-  };
-
-  // Close on outside click
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const urlLocation = searchParams.get("location");
@@ -85,6 +77,57 @@ export default function BrowseBoats() {
       setHasSearchParams(false);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsSortOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelectSort = (option: SortOption) => {
+    setSelectedSortLabel(option);
+    setIsSortOpen(false);
+
+    switch (option) {
+      case "Recommended":
+        setSortBy("created_at");
+        setSortOrder("desc");
+        break;
+
+      case "Boat Length: High to Low":
+        setSortBy("length");
+        setSortOrder("desc");
+        break;
+
+      case "Boat Length: Low to High":
+        setSortBy("length");
+        setSortOrder("asc");
+        break;
+
+      case "Capacity: High to Low":
+        setSortBy("capacity");
+        setSortOrder("desc");
+        break;
+
+      case "Capacity: Low to High":
+        setSortBy("capacity");
+        setSortOrder("asc");
+        break;
+
+      default:
+        setSortBy("created_at");
+        setSortOrder("desc");
+        break;
+    }
+  };
 
   const filters: BoatFilters = useMemo(
     () => ({
@@ -115,6 +158,8 @@ export default function BrowseBoats() {
 
   const { data: boatsResponse, isLoading, error } = useBoats(filters);
 
+  const boats = boatsResponse?.data || [];
+
   const handleViewBoat = (boat: any) => {
     setSelectedBoat(boat);
     setIsModalOpen(true);
@@ -135,10 +180,6 @@ export default function BrowseBoats() {
     setTimeout(() => setSelectedBoat(null), 300);
   };
 
-  const toggleSort = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
   const handleResetFilters = () => {
     setSearchQuery("");
     setSelectedDate(null);
@@ -149,16 +190,18 @@ export default function BrowseBoats() {
     setSelectedFeatures([]);
     setSortBy("created_at");
     setSortOrder("desc");
+    setSelectedSortLabel("Recommended");
     setHasSearchParams(false);
+    setIsSortOpen(false);
 
     setSearchParams({});
   };
 
-  const boats = boatsResponse?.data || [];
-
   const formatDateDisplay = (dateString: string | null) => {
     if (!dateString) return "Select a date";
+
     const date = new Date(dateString);
+
     return date.toLocaleDateString("en-US", {
       weekday: "long",
       month: "long",
@@ -186,17 +229,19 @@ export default function BrowseBoats() {
         </div>
 
         <div className="flex-1">
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <div className="flex items-start justify-between">
+          <div className="mb-4 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 w-full">
               <div>
                 <h1 className="text-gray-900 text-2xl font-semibold mb-1">
                   {formatDateDisplay(selectedDate)}
                 </h1>
+
                 <p className="text-gray-500 text-sm">
                   {isLoading
                     ? "Loading..."
                     : `${boats.length} boat${boats.length !== 1 ? "s" : ""} found`}
                 </p>
+
                 {slot && (
                   <p className="text-sm text-gray-500 mt-1">
                     Slot: {slot === "full-day" ? "Full Day" : slot}
@@ -208,60 +253,59 @@ export default function BrowseBoats() {
                 <Button
                   onClick={handleResetFilters}
                   variant="outline"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 w-fit"
                 >
                   <X className="w-4 h-4" />
                   Reset Filters
                 </Button>
               )}
             </div>
+          </div>
 
-            <div
-              ref={dropdownRef}
-              className="relative flex items-center justify-between"
-            >
-              {/* Search */}
-              <div className="relative flex-1 max-w-[206px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                <input
-                  type="text"
-                  placeholder="Search... Boats"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-[#EEF2F8] rounded-xl text-sm"
-                />
-              </div>
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="relative w-full sm:max-w-[260px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Search... Boats"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-[#EEF2F8] rounded-xl text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-primary"
+              />
+            </div>
 
-              {/* Button */}
+            <div ref={dropdownRef} className="relative w-full sm:w-auto">
               <button
-                onClick={toggleSortMenu}
-                className="flex items-center gap-2 px-4 py-2 text-gray-900 font-medium text-base hover:bg-gray-100 rounded-md"
+                type="button"
+                onClick={() => setIsSortOpen((prev) => !prev)}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-gray-900 font-medium text-base hover:bg-gray-100 rounded-md transition-colors"
               >
                 <ArrowUpDown className="w-5 h-5" />
                 <span>Sort</span>
               </button>
 
-              {/* Dropdown */}
-              {isOpen && (
-                <div className="absolute right-0 top-14 w-[260px] bg-white rounded-2xl shadow-xl border border-gray-100 p-3 z-50">
+              {isSortOpen && (
+                <div className="absolute right-0 top-12 w-full sm:w-[260px] bg-white rounded-2xl shadow-xl border border-gray-100 p-3 z-50">
                   <p className="text-xs text-gray-400 font-semibold mb-2 px-2">
                     SORT BY
                   </p>
 
                   <div className="space-y-1">
-                    {options.map((option) => (
+                    {SORT_OPTIONS.map((option) => (
                       <button
                         key={option}
-                        onClick={() => handleSelect(option)}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition
-              ${
-                selected === option
-                  ? "bg-blue-50 text-[#3B63FF] font-medium"
-                  : "hover:bg-gray-100 text-gray-700"
-              }`}
+                        type="button"
+                        onClick={() => handleSelectSort(option)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition ${
+                          selectedSortLabel === option
+                            ? "bg-blue-50 text-[#3B63FF] font-medium"
+                            : "hover:bg-gray-100 text-gray-700"
+                        }`}
                       >
-                        {option}
-                        {selected === option && <Check className="w-4 h-4" />}
+                        <span>{option}</span>
+                        {selectedSortLabel === option && (
+                          <Check className="w-4 h-4" />
+                        )}
                       </button>
                     ))}
                   </div>
@@ -292,7 +336,7 @@ export default function BrowseBoats() {
 
           {!isLoading && boats.length > 0 && (
             <div className="flex flex-col gap-5">
-              {boats.map((boat) => (
+              {boats.map((boat: any) => (
                 <BoatCard
                   key={boat.id}
                   id={boat.id}

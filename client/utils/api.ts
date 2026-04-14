@@ -2,7 +2,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 interface ApiOptions extends RequestInit {
-  auth?: boolean; // Include auth token (default: true)
+  auth?: boolean;
 }
 
 /**
@@ -11,7 +11,7 @@ interface ApiOptions extends RequestInit {
  */
 export async function apiCall<T>(
   endpoint: string,
-  options: ApiOptions = {}
+  options: ApiOptions = {},
 ): Promise<T> {
   const { auth = true, ...fetchOptions } = options;
 
@@ -21,7 +21,6 @@ export async function apiCall<T>(
     ...fetchOptions.headers,
   };
 
-  // Add Bearer token if needed
   if (auth) {
     const token = localStorage.getItem("accessToken");
     if (token) {
@@ -34,11 +33,9 @@ export async function apiCall<T>(
     headers,
   });
 
-  // Handle unauthorized
   if (response.status === 401) {
     localStorage.removeItem("user");
     localStorage.removeItem("accessToken");
-    
     throw new Error("Unauthorized. Please login again.");
   }
 
@@ -56,7 +53,7 @@ export async function apiCall<T>(
  */
 export async function publicApiCall<T>(
   endpoint: string,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<T> {
   return apiCall<T>(endpoint, { ...options, auth: false });
 }
@@ -72,7 +69,7 @@ export async function fetchProfile<T>(): Promise<T> {
  * Save/Update user profile
  */
 export async function saveProfile<T>(
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): Promise<T> {
   return apiCall<T>("/api/profile", {
     method: "PUT",
@@ -81,61 +78,123 @@ export async function saveProfile<T>(
 }
 
 /**
- * Fleet API Calls
+ * Fleet API Types
  */
+
+export type BookingTypeValue = "AM" | "PM" | "FULL_DAY";
+export type SlotFilterValue = "AM" | "PM" | "FULL_DAY" | "full-day";
 
 export interface BoatFilters {
   search?: string;
   date?: string;
-    slot?: string; // ✅ ADD THIS
+  slot?: SlotFilterValue | string;
   location?: string | string[];
   boat_type?: string | string[];
   length_min?: number;
   length_max?: number;
   features?: string | string[];
-  sort?: string;
-  order?: 'asc' | 'desc';
+  sort?: "boat_name" | "capacity" | "length" | "created_at" | string;
+  order?: "asc" | "desc";
   page?: number;
   per_page?: number;
 }
 
-export interface BoatListResponse {
-  data: Boat[];
-  pagination: {
-    total: number;
-    per_page: number;
-    current_page: number;
-    last_page: number;
-  };
+export interface BoatAvailabilityItem {
+  available: boolean;
+  waitlist: boolean;
+  label: string;
+}
+
+export interface BoatAvailability {
+  AM?: BoatAvailabilityItem;
+  PM?: BoatAvailabilityItem;
+  FULL_DAY?: BoatAvailabilityItem;
 }
 
 export interface Boat {
   id: number;
   boat_name: string;
+  name?: string;
+
   type: string;
+  category?: string;
+  boatType: string;
+
   image: string | null;
   images: string[];
+
   location: string;
-  boatType: string;
-  length: number;
-  capacity: number;
+  dock_location?: string;
+  boat_address?: string | null;
+
+  length: number | null;
+  capacity: number | null;
+  guests?: number | null;
+
+  weight_capacity?: number | null;
+  weightCapacity?: number | null;
+
+  fuel_capacity?: number | null;
+  fuelCapacity?: number | null;
+
   motor: string | null;
-  fuelCapacity: string | null;
+  engine_type?: string | null;
+  motor_year?: string | number | null;
+  model_number?: string | null;
+
+  registration_number?: string | null;
+  serial_number?: string | null;
+  hull_number?: string | null;
+
+  city?: string | null;
+  country?: string | null;
+  zipcode?: string | null;
+
   features: string[];
+
   description: string | null;
   notes: string | null;
+  additional_notes?: string | null;
   dockInstructions: string | null;
-  fare: number;
+
+  fare?: number | null;
   status: string;
-  badge: string | null;
+  badge: "most-booked" | "unavailable" | null | string;
   includedWithMembership: boolean;
+
   lastBooked: string | null;
+  lastBookedFormatted?: string | null;
+
+  availability?: BoatAvailability | null;
+}
+
+export interface PaginationMeta {
+  total: number;
+  per_page: number;
+  current_page: number;
+  last_page: number;
+}
+
+export interface BoatListResponse {
+  success?: boolean;
+  message?: string;
+  data: Boat[];
+  pagination: PaginationMeta;
+  filters?: Record<string, unknown>;
+}
+
+export interface SingleBoatResponse {
+  success?: boolean;
+  message?: string;
+  data: Boat;
 }
 
 export interface CalendarDay {
   day: number;
+  date?: string;
   available: boolean;
   boatsCount: number;
+  unavailableCount?: number;
 }
 
 export interface CalendarAvailability {
@@ -144,40 +203,83 @@ export interface CalendarAvailability {
   days: CalendarDay[];
 }
 
+export interface CalendarAvailabilityResponse {
+  success?: boolean;
+  message?: string;
+  data: CalendarAvailability;
+}
+
 /**
- * Get all boats with filters
+ * Fleet API Calls
  */
-export async function fetchBoats(filters: BoatFilters = {}): Promise<BoatListResponse> {
+
+export async function fetchBoats(
+  filters: BoatFilters = {},
+): Promise<BoatListResponse> {
   const params = new URLSearchParams();
 
-  if (filters.search) params.append('search', filters.search);
-  if (filters.date) params.append('date', filters.date);
- if (filters.slot) {
-  const mapping: Record<string, string> = {
-    AM: "AM",
-    PM: "PM",
-    "full-day": "FULL_DAY",
-  };
+  if (filters.search) params.append("search", filters.search);
+  if (filters.date) params.append("date", filters.date);
 
-  params.append('booking_type', mapping[filters.slot]);
-}
+  if (filters.slot) {
+    const mapping: Record<string, string> = {
+      AM: "AM",
+      PM: "PM",
+      FULL_DAY: "FULL_DAY",
+      "full-day": "FULL_DAY",
+    };
+
+    const mappedBookingType = mapping[filters.slot];
+    if (mappedBookingType) {
+      params.append("booking_type", mappedBookingType);
+    }
+  }
+
   if (filters.location) {
-    const locations = Array.isArray(filters.location) ? filters.location : [filters.location];
-    locations.forEach(loc => params.append('location', loc));
+    const locations = Array.isArray(filters.location)
+      ? filters.location
+      : [filters.location];
+
+    locations.forEach((loc) => {
+      if (loc) params.append("location", loc);
+    });
   }
+
   if (filters.boat_type) {
-    const types = Array.isArray(filters.boat_type) ? filters.boat_type : [filters.boat_type];
-    types.forEach(type => params.append('boat_type', type));
+    const types = Array.isArray(filters.boat_type)
+      ? filters.boat_type
+      : [filters.boat_type];
+
+    types.forEach((type) => {
+      if (type) params.append("boat_type", type);
+    });
   }
-  if (filters.length_min) params.append('length_min', filters.length_min.toString());
-  if (filters.length_max) params.append('length_max', filters.length_max.toString());
-  if (filters.sort) params.append('sort', filters.sort);
-  if (filters.order) params.append('order', filters.order);
-  if (filters.page) params.append('page', filters.page.toString());
-  if (filters.per_page) params.append('per_page', filters.per_page.toString());
+
+  if (filters.features) {
+    const features = Array.isArray(filters.features)
+      ? filters.features
+      : [filters.features];
+
+    features.forEach((feature) => {
+      if (feature) params.append("features[]", feature);
+    });
+  }
+
+  if (filters.length_min !== undefined && filters.length_min !== null) {
+    params.append("length_min", filters.length_min.toString());
+  }
+
+  if (filters.length_max !== undefined && filters.length_max !== null) {
+    params.append("length_max", filters.length_max.toString());
+  }
+
+  if (filters.sort) params.append("sort", filters.sort);
+  if (filters.order) params.append("order", filters.order);
+  if (filters.page) params.append("page", filters.page.toString());
+  if (filters.per_page) params.append("per_page", filters.per_page.toString());
 
   const queryString = params.toString();
-  const endpoint = `/api/fleets${queryString ? '?' + queryString : ''}`;
+  const endpoint = `/api/fleets${queryString ? `?${queryString}` : ""}`;
 
   return apiCall<BoatListResponse>(endpoint);
 }
@@ -186,7 +288,8 @@ export async function fetchBoats(filters: BoatFilters = {}): Promise<BoatListRes
  * Get single boat details
  */
 export async function fetchBoat(id: number): Promise<Boat> {
-  return apiCall<Boat>(`/api/fleets/${id}`);
+  const response = await apiCall<SingleBoatResponse>(`/api/fleets/${id}`);
+  return response.data;
 }
 
 /**
@@ -196,55 +299,71 @@ export async function fetchCalendarAvailability(
   month: number,
   year: number,
   location?: string,
-  boat_type?: string
+  boat_type?: string,
 ): Promise<CalendarAvailability> {
   const params = new URLSearchParams({
     month: month.toString(),
     year: year.toString(),
   });
 
-  if (location) params.append('location', location);
-  if (boat_type) params.append('boat_type', boat_type);
+  if (location) params.append("location", location);
+  if (boat_type) params.append("boat_type", boat_type);
 
   const queryString = params.toString();
-  return apiCall<CalendarAvailability>(
-    `/api/calendar-availability?${queryString}`
+
+  const response = await apiCall<CalendarAvailabilityResponse>(
+    `/api/calendar-availability?${queryString}`,
   );
+
+  return response.data;
 }
 
 /**
  * Get boat locations for filter
  */
 export async function fetchBoatLocations(): Promise<{ data: string[] }> {
-  return apiCall<{ data: string[] }>('/api/fleets/locations');
+  return apiCall<{ data: string[] }>("/api/fleets/locations");
 }
 
 /**
  * Get boat types for filter
  */
 export async function fetchBoatTypes(): Promise<{ data: string[] }> {
-  return apiCall<{ data: string[] }>('/api/fleets/types');
+  return apiCall<{ data: string[] }>("/api/fleets/types");
 }
 
 /**
  * Get boat features for filter
  */
 export async function fetchBoatFeatures(): Promise<{ data: string[] }> {
-  return apiCall<{ data: string[] }>('/api/fleets/features');
+  return apiCall<{ data: string[] }>("/api/fleets/features");
 }
 
 /**
- * Reservation API Calls
+ * Reservation API Types
  */
+
+export interface AvailableDateBookingType {
+  available: boolean;
+  waitlist: boolean;
+  label: string;
+}
 
 export interface AvailableDate {
   date: string;
   dayOfWeek: string;
   available: boolean;
   availableSlots: number;
+  booking_types?: {
+    AM?: AvailableDateBookingType;
+    PM?: AvailableDateBookingType;
+    FULL_DAY?: AvailableDateBookingType;
+  };
 }
 
 export interface AvailableDateResponse {
+  success?: boolean;
+  message?: string;
   data: AvailableDate[];
 }
 
@@ -255,27 +374,54 @@ export interface TimeSlot {
 }
 
 export interface AvailableTimesResponse {
+  success?: boolean;
+  message?: string;
   data: TimeSlot[];
+  meta?: {
+    booking_type: BookingTypeValue;
+    booking_type_label?: string;
+    due_time: string;
+    due_time_formatted: string;
+    is_waitlist?: boolean;
+  };
 }
 
 export interface Destination {
   id: string;
   name: string;
-  description: string;
+  description?: string;
 }
 
 export interface DestinationsResponse {
+  success?: boolean;
+  message?: string;
   data: Destination[];
+}
+
+export interface BookingMetaResponse {
+  success?: boolean;
+  message?: string;
+  data: {
+    booking_types: Array<{
+      value: BookingTypeValue;
+      label: string;
+    }>;
+    member_phone?: string | null;
+  };
 }
 
 export interface BookingPayload {
   fleet_id: number;
   start_date: string;
+  booking_type?: BookingTypeValue;
   start_time: string;
-  duration_hours: number;
+  duration_hours?: number;
   destination?: string;
   driver_requested?: boolean;
   customer_notes?: string;
+  member_phone?: string;
+  total_passengers?: number;
+  children_details?: string;
 }
 
 export interface ReservationData {
@@ -283,20 +429,42 @@ export interface ReservationData {
   booking_code: string;
   fleet_id: number;
   member_id: number;
+
   start_date: string;
+  start_date_formatted?: string;
+
   start_time: string;
-  end_date: string;
-  end_time: string;
-  duration_hours: number;
-  destination?: string;
-  driver_requested: boolean;
-  customer_notes?: string;
+  start_time_formatted?: string;
+
+  end_date?: string;
+  end_time?: string;
+
+  due_time?: string;
+  due_time_formatted?: string;
+
+  booking_type?: BookingTypeValue;
+  booking_type_label?: string;
+  duration_label?: string;
+
+  duration_hours?: number;
+  destination?: string | null;
+  driver_requested?: boolean;
+  customer_notes?: string | null;
+
+  member_phone?: string | null;
+  total_passengers?: number | null;
+  children_details?: string | null;
+
+  location?: string | null;
   status: string;
+
   created_at: string;
   updated_at: string;
 }
 
 export interface ReservationResponse {
+  success?: boolean;
+  message?: string;
   data: ReservationData;
 }
 
@@ -307,23 +475,31 @@ export interface AvailabilityCheck {
 }
 
 /**
+ * Get booking meta
+ */
+export async function fetchBookingMeta(): Promise<BookingMetaResponse> {
+  return apiCall<BookingMetaResponse>("/api/reservations/booking-meta");
+}
+
+/**
  * Get available dates for a specific boat
  */
 export async function fetchAvailableDates(
   fleetId: number,
   month?: number,
-  year?: number
+  year?: number,
 ): Promise<AvailableDateResponse> {
   const params = new URLSearchParams({
     fleet_id: fleetId.toString(),
   });
 
-  if (month) params.append('month', month.toString());
-  if (year) params.append('year', year.toString());
+  if (month) params.append("month", month.toString());
+  if (year) params.append("year", year.toString());
 
   const queryString = params.toString();
+
   return apiCall<AvailableDateResponse>(
-    `/api/reservations/available-dates?${queryString}`
+    `/api/reservations/available-dates?${queryString}`,
   );
 }
 
@@ -332,15 +508,20 @@ export async function fetchAvailableDates(
  */
 export async function fetchAvailableTimes(
   fleetId: number,
-  date: string
+  date: string,
+  bookingType?: BookingTypeValue,
 ): Promise<AvailableTimesResponse> {
   const params = new URLSearchParams({
     fleet_id: fleetId.toString(),
-    date: date,
+    date,
   });
 
+  if (bookingType) {
+    params.append("booking_type", bookingType);
+  }
+
   return apiCall<AvailableTimesResponse>(
-    `/api/reservations/available-times?${params.toString()}`
+    `/api/reservations/available-times?${params.toString()}`,
   );
 }
 
@@ -348,7 +529,7 @@ export async function fetchAvailableTimes(
  * Get list of destinations
  */
 export async function fetchDestinations(): Promise<DestinationsResponse> {
-  return apiCall<DestinationsResponse>('/api/reservations/destinations');
+  return apiCall<DestinationsResponse>("/api/reservations/destinations");
 }
 
 /**
@@ -358,17 +539,17 @@ export async function checkAvailability(
   fleetId: number,
   date: string,
   startTime: string,
-  durationHours: number
+  durationHours: number,
 ): Promise<AvailabilityCheck> {
   const params = new URLSearchParams({
     fleet_id: fleetId.toString(),
-    date: date,
+    date,
     start_time: startTime,
     duration_hours: durationHours.toString(),
   });
 
   return apiCall<AvailabilityCheck>(
-    `/api/reservations/check-availability?${params.toString()}`
+    `/api/reservations/check-availability?${params.toString()}`,
   );
 }
 
@@ -376,10 +557,10 @@ export async function checkAvailability(
  * Create a reservation (booking)
  */
 export async function createReservation(
-  payload: BookingPayload
+  payload: BookingPayload,
 ): Promise<ReservationResponse> {
-  return apiCall<ReservationResponse>('/api/reservations', {
-    method: 'POST',
+  return apiCall<ReservationResponse>("/api/reservations", {
+    method: "POST",
     body: JSON.stringify(payload),
   });
 }
@@ -387,12 +568,14 @@ export async function createReservation(
 /**
  * Get reservation details
  */
-export async function fetchReservation(id: number): Promise<ReservationResponse> {
+export async function fetchReservation(
+  id: number,
+): Promise<ReservationResponse> {
   return apiCall<ReservationResponse>(`/api/reservations/${id}`);
 }
 
 /**
- * My Bookings API Calls
+ * My Bookings API Types
  */
 
 export interface FleetInfo {
@@ -426,6 +609,8 @@ export interface MyBooking {
 }
 
 export interface MyBookingsResponse {
+  success?: boolean;
+  message?: string;
   data: MyBooking[];
   pagination: {
     total: number;
@@ -438,15 +623,17 @@ export interface MyBookingsResponse {
 /**
  * Get current user's bookings with optional status filter
  */
-export async function fetchMyBookings(status?: string): Promise<MyBookingsResponse> {
+export async function fetchMyBookings(
+  status?: string,
+): Promise<MyBookingsResponse> {
   const params = new URLSearchParams();
 
   if (status) {
-    params.append('status', status);
+    params.append("status", status);
   }
 
   const queryString = params.toString();
-  const endpoint = `/api/my-bookings${queryString ? '?' + queryString : ''}`;
+  const endpoint = `/api/my-bookings${queryString ? `?${queryString}` : ""}`;
 
   return apiCall<MyBookingsResponse>(endpoint);
 }

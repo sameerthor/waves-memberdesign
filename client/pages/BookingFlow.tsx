@@ -7,8 +7,9 @@ import {
   Info,
   CheckCircle2,
   AlertCircle,
-  Calendar as CalendarIcon,
   Clock3,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -20,12 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -142,6 +137,13 @@ interface BookingData {
   childrenDetails: string;
 }
 
+interface BookingCalendarDay {
+  day: number;
+  available: boolean;
+  boatsCount: number;
+  isPast: boolean;
+}
+
 type BookingTypeValue = "AM" | "PM" | "FULL_DAY";
 
 function toLocalDate(value: string) {
@@ -223,6 +225,7 @@ function useAsyncData<T>(
 export default function BookingFlow() {
   const navigate = useNavigate();
   const location = useLocation();
+
   const bookingState = location.state as
     | {
         boat?: Boat;
@@ -268,6 +271,7 @@ export default function BookingFlow() {
     totalPassengers: "",
     childrenDetails: "",
   });
+
   const selectedBookingDate = bookingData.date
     ? toLocalDate(bookingData.date)
     : undefined;
@@ -275,19 +279,19 @@ export default function BookingFlow() {
   const [calendarMonth, setCalendarMonth] = useState<Date>(
     selectedBookingDate ?? today,
   );
-  const [createdReservationId, setCreatedReservationId] = useState<
-    number | null
-  >(null);
-  const [createdReservation, setCreatedReservation] = useState<
-    ReservationResponse["data"] | null
-  >(null);
+  const [createdReservationId, setCreatedReservationId] = useState<number | null>(null);
+  const [createdReservation, setCreatedReservation] =
+    useState<ReservationResponse["data"] | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!boat) {
-    navigate("/");
-    return null;
-  }
+  useEffect(() => {
+    if (!boat) {
+      navigate("/");
+    }
+  }, [boat, navigate]);
+
+  if (!boat) return null;
 
   const boatName = boat.boat_name || boat.name || "Boat";
   const boatImage = boat.images?.[0] || boat.image || "";
@@ -330,6 +334,7 @@ export default function BookingFlow() {
       return { ...prev, memberPhone: phone };
     });
   }, [bookingMeta.data?.data?.member_phone]);
+
   useEffect(() => {
     if (!bookingData.date) return;
 
@@ -346,6 +351,7 @@ export default function BookingFlow() {
       return nextMonth;
     });
   }, [bookingData.date]);
+
   const fetchCreatedReservation = async (reservationId: number) => {
     const data = await apiFetch<ReservationResponse>(
       `/api/reservations/${reservationId}`,
@@ -388,19 +394,19 @@ export default function BookingFlow() {
         value: "AM" as BookingTypeValue,
         label: meta?.AM?.label || "AM",
         isWaitlist: meta?.AM?.waitlist || false,
-        isDisabled: !bookingData.date,
+        isDisabled: !bookingData.date || !meta?.AM?.available,
       },
       {
         value: "PM" as BookingTypeValue,
         label: meta?.PM?.label || "PM",
         isWaitlist: meta?.PM?.waitlist || false,
-        isDisabled: !bookingData.date,
+        isDisabled: !bookingData.date || !meta?.PM?.available,
       },
       {
         value: "FULL_DAY" as BookingTypeValue,
         label: meta?.FULL_DAY?.label || "Full Day",
         isWaitlist: meta?.FULL_DAY?.waitlist || false,
-        isDisabled: !bookingData.date,
+        isDisabled: !bookingData.date || !meta?.FULL_DAY?.available,
       },
     ];
   }, [selectedDateMeta, bookingData.date]);
@@ -413,6 +419,7 @@ export default function BookingFlow() {
   const dueTimeFormatted =
     availableTimes.data?.meta?.due_time_formatted || "--:--";
   const isWaitlistSelected = !!availableTimes.data?.meta?.is_waitlist;
+
   const selectedBookingTypeLabel =
     availableTimes.data?.meta?.booking_type_label ||
     bookingMeta.data?.data?.booking_types?.find(
@@ -421,27 +428,103 @@ export default function BookingFlow() {
     bookingData.bookingType ||
     "—";
 
-  const selectableDateSet = useMemo(() => {
-    const set = new Set<string>();
-
-    availableDates.data?.data
-      ?.filter((dateOption) => {
-        const dateObj = toLocalDate(dateOption.date);
-        dateObj.setHours(0, 0, 0, 0);
-        return dateOption.available && dateObj >= today && dateObj <= maxDate;
-      })
-      .forEach((dateOption) => {
-        set.add(dateOption.date);
-      });
-
-    return set;
-  }, [availableDates.data, today, maxDate]);
-
   const startTimeLabel =
     availableTimes.data?.data?.find((t) => t.time === bookingData.startTime)
       ?.label ||
     bookingData.startTime ||
     "—";
+
+  const getDaysInMonth = (date: Date) =>
+    new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+
+  const getFirstDayOfMonth = (date: Date) =>
+    new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+
+  const formatLocalDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const daysInMonth = getDaysInMonth(calendarMonth);
+  const firstDay = getFirstDayOfMonth(calendarMonth);
+
+  const availabilityDays = availableDates.data?.data || [];
+
+  const calendarDays: (BookingCalendarDay | null)[] = [];
+
+  for (let i = 0; i < firstDay; i++) {
+    calendarDays.push(null);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const calendarDay = availabilityDays.find((d) => d.dayOfWeek || d.date);
+    const fullDate = new Date(
+      calendarMonth.getFullYear(),
+      calendarMonth.getMonth(),
+      day,
+    );
+    fullDate.setHours(0, 0, 0, 0);
+
+    const fullDateString = formatLocalDate(fullDate);
+
+    const dayData = availabilityDays.find((d) => d.date === fullDateString);
+
+    const isPast = fullDate < today;
+
+    calendarDays.push({
+      day,
+      available: dayData?.available ?? false,
+      boatsCount: dayData?.availableSlots ?? 0,
+      isPast,
+    });
+  }
+
+  const selectedDayOfMonth = useMemo(() => {
+    if (!bookingData.date) return null;
+
+    const [year, month, day] = bookingData.date.split("-").map(Number);
+
+    if (
+      year === calendarMonth.getFullYear() &&
+      month === calendarMonth.getMonth() + 1
+    ) {
+      return day;
+    }
+
+    return null;
+  }, [bookingData.date, calendarMonth]);
+
+  const monthName = calendarMonth.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const handlePrevMonth = () => {
+    setCalendarMonth(
+      new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1),
+    );
+  };
+
+  const handleNextMonth = () => {
+    setCalendarMonth(
+      new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1),
+    );
+  };
+
+  const handleDateSelect = (day: number) => {
+    const selected = new Date(
+      calendarMonth.getFullYear(),
+      calendarMonth.getMonth(),
+      day,
+    );
+    selected.setHours(0, 0, 0, 0);
+
+    const dateString = formatLocalDate(selected);
+    handleInputChange("date", dateString);
+  };
 
   const validateStepOne = () => {
     if (
@@ -626,24 +709,87 @@ export default function BookingFlow() {
                         Failed to load dates
                       </div>
                     ) : (
-                      <div className="rounded-lg border border-gray-300 bg-white p-2">
-                        <Calendar
-                          mode="single"
-                          month={calendarMonth}
-                          onMonthChange={setCalendarMonth}
-                          selected={selectedBookingDate}
-                          onSelect={(date) => {
-                            if (!date) return;
+                      <div className="bg-white rounded-md p-5 border border-gray-300">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-gray-900 font-semibold text-base">
+                            {monthName}
+                          </h3>
 
-                            const normalizedDate = new Date(date);
-                            normalizedDate.setHours(0, 0, 0, 0);
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={handlePrevMonth}
+                              className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
+                            >
+                              <ChevronLeft className="w-3 h-3 text-gray-900" />
+                            </button>
 
-                            const apiDate = toApiDate(normalizedDate);
-                            handleInputChange("date", apiDate);
-                          }}
-                          className="w-full"
-                          initialFocus
-                        />
+                            <button
+                              type="button"
+                              onClick={handleNextMonth}
+                              className="w-7 h-7 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
+                            >
+                              <ChevronRight className="w-3 h-3 text-gray-900" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-7 gap-1">
+                          {daysOfWeek.map((day) => (
+                            <div key={day} className="text-center pb-2">
+                              <span className="text-gray-500 text-xs font-semibold">
+                                {day}
+                              </span>
+                            </div>
+                          ))}
+
+                          {calendarDays.map((dayData, index) => (
+                            <div
+                              key={index}
+                              className="aspect-square flex items-center justify-center"
+                            >
+                              {dayData ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDateSelect(dayData.day)}
+                                  disabled={!dayData.available || dayData.isPast}
+                                  className={cn(
+                                    "w-8 h-8 rounded-md flex items-center justify-center text-sm transition-colors",
+                                    selectedDayOfMonth === dayData.day &&
+                                      bookingData.date
+                                      ? "bg-blue-primary text-white font-semibold"
+                                      : dayData.available && !dayData.isPast
+                                        ? "bg-green-badge text-white hover:opacity-80"
+                                        : "bg-gray-100 text-gray-400 cursor-not-allowed",
+                                  )}
+                                  title={
+                                    dayData.isPast
+                                      ? "Past date"
+                                      : dayData.available
+                                        ? `${dayData.boatsCount} slot(s) available`
+                                        : "Not available"
+                                  }
+                                >
+                                  {dayData.day}
+                                </button>
+                              ) : null}
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-200">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-green-badge rounded-sm"></div>
+                            <span className="text-xs text-gray-900">Available</span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-gray-300 rounded-sm"></div>
+                            <span className="text-xs text-gray-900">
+                              Unavailable / Past
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     )}
 
@@ -739,6 +885,44 @@ export default function BookingFlow() {
                                 disabled={!timeSlot.available}
                               >
                                 {timeSlot.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
+
+                    <div className="space-y-2 mt-5">
+                      <Label
+                        htmlFor="destination"
+                        className="text-[#171A22] text-[14px] font-semibold"
+                      >
+                        Destination
+                      </Label>
+
+                      {destinations.isLoading ? (
+                        <div className="h-11 bg-gray-100 rounded-lg animate-pulse" />
+                      ) : (
+                        <Select
+                          value={bookingData.destination || "__none__"}
+                          onValueChange={(value) =>
+                            handleInputChange(
+                              "destination",
+                              value === "__none__" ? "" : value,
+                            )
+                          }
+                        >
+                          <SelectTrigger
+                            id="destination"
+                            className="h-11 bg-white border-gray-300 rounded-lg text-[14px]"
+                          >
+                            <SelectValue placeholder="Select destination" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="__none__">Not specified</SelectItem>
+                            {destinations.data?.data?.map((destination) => (
+                              <SelectItem key={destination.id} value={destination.id}>
+                                {destination.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
