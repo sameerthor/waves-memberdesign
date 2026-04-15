@@ -881,7 +881,7 @@ start_time: bookingData.startTime || undefined,
 
                       {!bookingData.date || !bookingData.bookingType ? (
                         <div className="h-11 bg-gray-100 rounded-lg flex items-center px-3 text-gray-500 text-sm border border-gray-200">
-                          Select date and booking type first
+                          Select date and reservation type first
                         </div>
                       ) : availableTimes.isLoading ? (
                         <div className="h-11 bg-gray-100 rounded-lg animate-pulse" />
