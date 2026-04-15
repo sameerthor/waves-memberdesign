@@ -386,30 +386,34 @@ export default function BookingFlow() {
     );
   }, [availableDates.data, bookingData.date]);
 
-  const bookingTypeCards = useMemo(() => {
-    const meta = selectedDateMeta?.booking_types;
+const bookingTypeCards = useMemo(() => {
+  const meta = selectedDateMeta?.booking_types;
 
-    return [
-      {
-        value: "AM" as BookingTypeValue,
-        label: meta?.AM?.label || "AM",
-        isWaitlist: meta?.AM?.waitlist || false,
-        isDisabled: !bookingData.date || !meta?.AM?.available,
-      },
-      {
-        value: "PM" as BookingTypeValue,
-        label: meta?.PM?.label || "PM",
-        isWaitlist: meta?.PM?.waitlist || false,
-        isDisabled: !bookingData.date || !meta?.PM?.available,
-      },
-      {
-        value: "FULL_DAY" as BookingTypeValue,
-        label: meta?.FULL_DAY?.label || "Full Day",
-        isWaitlist: meta?.FULL_DAY?.waitlist || false,
-        isDisabled: !bookingData.date || !meta?.FULL_DAY?.available,
-      },
-    ];
-  }, [selectedDateMeta, bookingData.date]);
+  return [
+    {
+      value: "AM" as BookingTypeValue,
+      label: meta?.AM?.label || "AM",
+      isWaitlist: meta?.AM?.waitlist || false,
+      isDisabled:
+        !bookingData.date || (!meta?.AM?.available && !meta?.AM?.waitlist),
+    },
+    {
+      value: "PM" as BookingTypeValue,
+      label: meta?.PM?.label || "PM",
+      isWaitlist: meta?.PM?.waitlist || false,
+      isDisabled:
+        !bookingData.date || (!meta?.PM?.available && !meta?.PM?.waitlist),
+    },
+    {
+      value: "FULL_DAY" as BookingTypeValue,
+      label: meta?.FULL_DAY?.label || "Full Day",
+      isWaitlist: meta?.FULL_DAY?.waitlist || false,
+      isDisabled:
+        !bookingData.date ||
+        (!meta?.FULL_DAY?.available && !meta?.FULL_DAY?.waitlist),
+    },
+  ];
+}, [selectedDateMeta, bookingData.date]);
 
   const selectedDestinationName = bookingData.destination
     ? destinations.data?.data?.find((d) => d.id === bookingData.destination)
@@ -526,42 +530,48 @@ export default function BookingFlow() {
     handleInputChange("date", dateString);
   };
 
-  const validateStepOne = () => {
-    if (
-      !bookingData.date ||
-      !bookingData.bookingType ||
-      !bookingData.startTime
-    ) {
-      setBookingError("Please fill in all required booking fields.");
-      return false;
-    }
+  const selectedBookingTypeMeta = useMemo(() => {
+  if (!selectedDateMeta?.booking_types || !bookingData.bookingType) return null;
 
-    if (!bookingData.memberPhone.trim()) {
-      setBookingError("Please enter contact phone number.");
-      return false;
-    }
+  return selectedDateMeta.booking_types[bookingData.bookingType] || null;
+}, [selectedDateMeta, bookingData.bookingType]);
 
-    if (!bookingData.totalPassengers.trim()) {
-      setBookingError("Please enter total number of passengers.");
-      return false;
-    }
+const isSelectedTypeWaitlist = !!selectedBookingTypeMeta?.waitlist;
+const validateStepOne = () => {
+  if (!bookingData.date || !bookingData.bookingType) {
+    setBookingError("Please fill in all required booking fields.");
+    return false;
+  }
 
-    const passengerCount = Number(bookingData.totalPassengers);
+  if (!isSelectedTypeWaitlist && !bookingData.startTime) {
+    setBookingError("Please select a start time.");
+    return false;
+  }
 
-    if (!Number.isInteger(passengerCount) || passengerCount < 1) {
-      setBookingError("Total number of passengers must be at least 1.");
-      return false;
-    }
+  if (!bookingData.memberPhone.trim()) {
+    setBookingError("Please enter contact phone number.");
+    return false;
+  }
 
-    if (boatCapacity > 0 && passengerCount > boatCapacity) {
-      setBookingError(
-        `Total passengers exceed boat capacity of ${boatCapacity}.`,
-      );
-      return false;
-    }
+  if (!bookingData.totalPassengers.trim()) {
+    setBookingError("Please enter total number of passengers.");
+    return false;
+  }
 
-    return true;
-  };
+  const passengerCount = Number(bookingData.totalPassengers);
+
+  if (!Number.isInteger(passengerCount) || passengerCount < 1) {
+    setBookingError("Total number of passengers must be at least 1.");
+    return false;
+  }
+
+  if (boatCapacity > 0 && passengerCount > boatCapacity) {
+    setBookingError(`Total passengers exceed boat capacity of ${boatCapacity}.`);
+    return false;
+  }
+
+  return true;
+};
 
   const handleContinue = async () => {
     if (step === 1) {
@@ -585,7 +595,7 @@ export default function BookingFlow() {
               fleet_id: boat.id,
               start_date: bookingData.date,
               booking_type: bookingData.bookingType,
-              start_time: bookingData.startTime,
+start_time: bookingData.startTime || undefined,
               destination: bookingData.destination || undefined,
               customer_notes: bookingData.notes || undefined,
               member_phone: bookingData.memberPhone.trim(),
@@ -855,7 +865,7 @@ export default function BookingFlow() {
                         htmlFor="startTime"
                         className="text-[#171A22] text-[14px] font-semibold"
                       >
-                        Start Time *
+                        Start Time 
                       </Label>
 
                       {!bookingData.date || !bookingData.bookingType ? (
