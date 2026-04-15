@@ -98,8 +98,12 @@ interface EditMetaResponse {
     fleet_id: number;
     boat_name: string | null;
     location: string | null;
-    booking_type: "AM" | "PM" | "FULL_DAY";
+    selected_date?: string | null;
+    selected_booking_type?: "AM" | "PM" | "FULL_DAY";
+    current_start_time?: string | null;
     due_time: string | null;
+    due_time_formatted?: string | null;
+    is_waitlist?: boolean;
     time_slots: Array<{
       time: string;
       label: string;
@@ -108,6 +112,8 @@ interface EditMetaResponse {
     booking_types: Array<{
       value: "AM" | "PM" | "FULL_DAY";
       label: string;
+      available?: boolean;
+      waitlist?: boolean;
     }>;
   };
 }
@@ -618,7 +624,7 @@ function EditReservationModal({
       booking_type: reservation.booking_type || "",
       start_time: reservation.start_time || "",
       destination: reservation.destination || "",
-      customer_notes: "",
+      customer_notes: (reservation as any).customer_notes || ""
     });
     setError("");
   }, [reservation, open]);
@@ -653,7 +659,7 @@ function EditReservationModal({
         body: JSON.stringify({
           start_date: form.start_date,
           booking_type: form.booking_type,
-          start_time: form.start_time,
+          start_time: form.start_time || undefined,
           destination: form.destination || null,
           customer_notes: form.customer_notes || null,
         }),
@@ -669,25 +675,42 @@ function EditReservationModal({
   });
 
   const bookingTypes = editMetaQuery.data?.data.booking_types || [
-    { value: "AM", label: "AM" },
-    { value: "PM", label: "PM" },
-    { value: "FULL_DAY", label: "Full Day" },
+    { value: "AM", label: "AM", available: true, waitlist: false },
+    { value: "PM", label: "PM", available: true, waitlist: false },
+    { value: "FULL_DAY", label: "Full Day", available: true, waitlist: false },
   ];
 
   const timeSlots = editMetaQuery.data?.data.time_slots || [];
+  const dueTime =
+    (editMetaQuery.data?.data as any)?.due_time_formatted ||
+    (form.booking_type === "AM"
+      ? "12:00 PM"
+      : form.booking_type === "PM"
+        ? "05:00 PM"
+        : form.booking_type === "FULL_DAY"
+          ? "05:00 PM"
+          : "—");
 
-  const dueTime = useMemo(() => {
-    if (form.booking_type === "AM") return "12:00 PM";
-    if (form.booking_type === "PM") return "05:00 PM";
-    if (form.booking_type === "FULL_DAY") return "05:00 PM";
-    return "—";
-  }, [form.booking_type]);
+  const selectedBookingTypeMeta = useMemo(() => {
+    if (!form.booking_type) return null;
+
+    return (
+      bookingTypes.find((item) => item.value === form.booking_type) || null
+    );
+  }, [bookingTypes, form.booking_type]);
+
+  const isSelectedTypeWaitlist = !!(selectedBookingTypeMeta as any)?.waitlist;
 
   const handleSubmit = () => {
     setError("");
 
-    if (!form.start_date || !form.booking_type || !form.start_time) {
+    if (!form.start_date || !form.booking_type) {
       setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (!isSelectedTypeWaitlist && !form.start_time) {
+      setError("Please select a start time.");
       return;
     }
 
@@ -749,7 +772,12 @@ function EditReservationModal({
                 type="date"
                 value={form.start_date}
                 onChange={(e) =>
-                  setForm((prev) => ({ ...prev, start_date: e.target.value, start_time: "" }))
+                  setForm((prev) => ({
+                    ...prev,
+                    start_date: e.target.value,
+                    booking_type: prev.booking_type,
+                    start_time: "",
+                  }))
                 }
                 className="w-full h-10 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 outline-none focus:border-blue-500"
               />
@@ -760,7 +788,11 @@ function EditReservationModal({
               <Select
                 value={form.booking_type}
                 onValueChange={(value: "AM" | "PM" | "FULL_DAY") =>
-                  setForm((prev) => ({ ...prev, booking_type: value, start_time: "" }))
+                  setForm((prev) => ({
+                    ...prev,
+                    booking_type: value,
+                    start_time: "",
+                  }))
                 }
               >
                 <SelectTrigger className="bg-white border-gray-300">
@@ -780,28 +812,34 @@ function EditReservationModal({
           <div className="w-full">
             <div className="space-y-2">
               <Label className="text-gray-900 text-sm">Start Time *</Label>
-              <Select
-                value={form.start_time}
-                onValueChange={(value) =>
-                  setForm((prev) => ({ ...prev, start_time: value }))
-                }
-              >
-                <SelectTrigger className="bg-white border-gray-300">
-                  <SelectValue placeholder="Select time slot" />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeSlots.map((slot) => (
-                    <SelectItem
-                      key={slot.time}
-                      value={slot.time}
-                      disabled={!slot.available}
-                    >
-                      {slot.label}
-                      {!slot.available ? " (Reserved)" : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {!form.start_date || !form.booking_type ? (
+                <div className="h-10 rounded-md border border-gray-300 bg-gray-50 px-3 flex items-center text-sm text-gray-500">
+                  Select date and reservation type first
+                </div>
+              ) : (
+                <Select
+                  value={form.start_time}
+                  onValueChange={(value) =>
+                    setForm((prev) => ({ ...prev, start_time: value }))
+                  }
+                >
+                  <SelectTrigger className="bg-white border-gray-300">
+                    <SelectValue placeholder="Select time slot" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeSlots.map((slot) => (
+                      <SelectItem
+                        key={slot.time}
+                        value={slot.time}
+                        disabled={!slot.available}
+                      >
+                        {slot.label}
+                        {!slot.available ? " (Reserved)" : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <div className="flex items-start gap-2 text-gray-500 mt-2 pl-1">
@@ -810,39 +848,7 @@ function EditReservationModal({
                 Due back At or before {dueTime}
               </span>
             </div>
-
-            {/* <div className="space-y-2">
-              <Label className="text-gray-900 text-sm">End Time</Label>
-              <div className="h-10 rounded-md border border-gray-300 bg-gray-50 px-3 flex items-center text-sm text-gray-700">
-                {dueTime}
-              </div>
-            </div> */}
           </div>
-
-          {/* <div className="space-y-2">
-            <Label className="text-gray-900 text-sm">Destination</Label>
-            <Select
-              value={form.destination || "__none__"}
-              onValueChange={(value) =>
-                setForm((prev) => ({
-                  ...prev,
-                  destination: value === "__none__" ? "" : value,
-                }))
-              }
-            >
-              <SelectTrigger className="bg-white border-gray-300">
-                <SelectValue placeholder="Where would you like to go" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__none__">Not specified</SelectItem>
-                {destinationsQuery.data?.data?.map((dest) => (
-                  <SelectItem key={dest.id} value={dest.id}>
-                    {dest.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div> */}
 
           <div className="space-y-2">
             <Label className="text-gray-900 text-sm">Notes</Label>

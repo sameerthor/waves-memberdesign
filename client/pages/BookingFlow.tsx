@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
 import {
   MapPin,
+    Weight,
   Users,
   Info,
   CheckCircle2,
@@ -34,6 +35,7 @@ interface Boat {
   location?: string;
   guests?: number;
   capacity?: number;
+    weightCapacity?: number | string | null;
   images?: string[];
   image?: string;
   includedWithMembership?: boolean;
@@ -297,7 +299,7 @@ export default function BookingFlow() {
   const boatImage = boat.images?.[0] || boat.image || "";
   const boatLocation = boat.location || "Location unavailable";
   const boatCapacity = Number(boat.guests ?? boat.capacity ?? 0);
-
+const boatWeightCapacity = boat.weightCapacity ?? null;
   const bookingMeta = useAsyncData<BookingMetaResponse>(
     true,
     "booking-meta",
@@ -686,12 +688,21 @@ start_time: bookingData.startTime || undefined,
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-gray-500" />
-                  <span className="text-gray-600 text-[15px]">
-                    {boatCapacity || 0} Guests
-                  </span>
-                </div>
+            <div className="flex items-center gap-4 flex-wrap">
+  <div className="flex items-center gap-2">
+    <Users className="w-4 h-4 text-gray-500" />
+    <span className="text-gray-600 text-[15px]">
+      {boatCapacity || 0} Guests
+    </span>
+  </div>
+
+  <div className="flex items-center gap-2">
+    <Weight className="w-4 h-4 text-gray-500" />
+    <span className="text-gray-600 text-[15px]">
+      {boatWeightCapacity ? `${boatWeightCapacity} lbs` : "—"}
+    </span>
+  </div>
+</div>
               </div>
 
               <div className="px-5 md:px-6 py-5">
@@ -836,7 +847,7 @@ start_time: bookingData.startTime || undefined,
                                 : isSelected
                                   ? "bg-blue-primary text-white border-blue-primary"
                                   : item.isWaitlist
-                                    ? "bg-[#F3F4F8] text-gray-600 border-gray-200"
+                                    ? "bg-[#ffa929] text-gray-600 border-gray-200"
                                     : "bg-white text-[#171A22] border-gray-200 hover:border-blue-primary/40",
                             )}
                           >
