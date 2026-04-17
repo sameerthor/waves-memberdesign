@@ -509,36 +509,31 @@ function ViewReservationModal({
                 {reservation.start_date_formatted || "—"}
               </div>
             </div>
-            <div className="rounded-lg border border-black/[0.08] p-4">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                Time
-              </div>
-              <div className="text-sm font-semibold text-gray-900">
-                {formatTripTime(reservation)}
-              </div>
-            </div>
+           <div className="rounded-lg border border-black/[0.08] p-4">
+  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+    Reservation Start Time
+  </div>
+  <div className="text-sm font-semibold text-gray-900">
+    {reservation.start_time_formatted}
+  </div>
+
+  <div className="text-[12px] text-gray-600 italic mt-1">
+    Due back:{" "}
+    {reservation.booking_type === "AM"
+      ? "At or before 12:00 PM"
+      : reservation.booking_type === "PM"
+        ? "At or before 5:00 PM"
+        : reservation.booking_type === "FULL_DAY"
+          ? "At or before 5:00 PM"
+          : "—"}
+  </div>
+</div>
             <div className="rounded-lg border border-black/[0.08] p-4">
               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                 Reservation Type
               </div>
               <div className="text-sm font-semibold text-gray-900">
                 {reservation.booking_type_label || "—"}
-              </div>
-            </div>
-            <div className="rounded-lg border border-black/[0.08] p-4">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                Duration
-              </div>
-              <div className="text-sm font-semibold text-gray-900">
-                {reservation.duration_label || "—"}
-              </div>
-            </div>
-            <div className="rounded-lg border border-black/[0.08] p-4">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                Destination
-              </div>
-              <div className="text-sm font-semibold text-gray-900">
-                {reservation.destination || "Not specified"}
               </div>
             </div>
             <div className="rounded-lg border border-black/[0.08] p-4">

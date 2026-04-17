@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
 import {
   MapPin,
-    Weight,
+  Weight,
   Users,
   Info,
   CheckCircle2,
@@ -35,7 +35,7 @@ interface Boat {
   location?: string;
   guests?: number;
   capacity?: number;
-    weightCapacity?: number | string | null;
+  weightCapacity?: number | string | null;
   images?: string[];
   image?: string;
   includedWithMembership?: boolean;
@@ -158,7 +158,7 @@ function toApiDate(date: Date) {
 }
 
 function formatPhoneCapacityText(capacity: number) {
-  return `Capacity is ${capacity}`;
+  return `${capacity} Guests (Maximum Capacity)`;
 }
 
 async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
@@ -281,11 +281,18 @@ export default function BookingFlow() {
   const [calendarMonth, setCalendarMonth] = useState<Date>(
     selectedBookingDate ?? today,
   );
-  const [createdReservationId, setCreatedReservationId] = useState<number | null>(null);
+  const [createdReservationId, setCreatedReservationId] =
+    useState<number | null>(null);
   const [createdReservation, setCreatedReservation] =
     useState<ReservationResponse["data"] | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const dateSectionRef = useRef<HTMLDivElement | null>(null);
+  const bookingTypeSectionRef = useRef<HTMLDivElement | null>(null);
+  const startTimeSectionRef = useRef<HTMLDivElement | null>(null);
+  const memberPhoneSectionRef = useRef<HTMLDivElement | null>(null);
+  const passengersSectionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!boat) {
@@ -299,7 +306,8 @@ export default function BookingFlow() {
   const boatImage = boat.images?.[0] || boat.image || "";
   const boatLocation = boat.location || "Location unavailable";
   const boatCapacity = Number(boat.guests ?? boat.capacity ?? 0);
-const boatWeightCapacity = boat.weightCapacity ?? null;
+  const boatWeightCapacity = boat.weightCapacity ?? null;
+
   const bookingMeta = useAsyncData<BookingMetaResponse>(
     true,
     "booking-meta",
@@ -380,6 +388,17 @@ const boatWeightCapacity = boat.weightCapacity ?? null;
     });
   };
 
+  const scrollToField = (
+    ref: React.RefObject<HTMLDivElement | null>,
+  ) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  };
+
   const selectedDateMeta = useMemo(() => {
     return (
       availableDates.data?.data?.find(
@@ -388,34 +407,34 @@ const boatWeightCapacity = boat.weightCapacity ?? null;
     );
   }, [availableDates.data, bookingData.date]);
 
-const bookingTypeCards = useMemo(() => {
-  const meta = selectedDateMeta?.booking_types;
+  const bookingTypeCards = useMemo(() => {
+    const meta = selectedDateMeta?.booking_types;
 
-  return [
-    {
-      value: "AM" as BookingTypeValue,
-      label: meta?.AM?.label || "AM",
-      isWaitlist: meta?.AM?.waitlist || false,
-      isDisabled:
-        !bookingData.date || (!meta?.AM?.available && !meta?.AM?.waitlist),
-    },
-    {
-      value: "PM" as BookingTypeValue,
-      label: meta?.PM?.label || "PM",
-      isWaitlist: meta?.PM?.waitlist || false,
-      isDisabled:
-        !bookingData.date || (!meta?.PM?.available && !meta?.PM?.waitlist),
-    },
-    {
-      value: "FULL_DAY" as BookingTypeValue,
-      label: meta?.FULL_DAY?.label || "Full Day",
-      isWaitlist: meta?.FULL_DAY?.waitlist || false,
-      isDisabled:
-        !bookingData.date ||
-        (!meta?.FULL_DAY?.available && !meta?.FULL_DAY?.waitlist),
-    },
-  ];
-}, [selectedDateMeta, bookingData.date]);
+    return [
+      {
+        value: "AM" as BookingTypeValue,
+        label: meta?.AM?.label || "AM",
+        isWaitlist: meta?.AM?.waitlist || false,
+        isDisabled:
+          !bookingData.date || (!meta?.AM?.available && !meta?.AM?.waitlist),
+      },
+      {
+        value: "PM" as BookingTypeValue,
+        label: meta?.PM?.label || "PM",
+        isWaitlist: meta?.PM?.waitlist || false,
+        isDisabled:
+          !bookingData.date || (!meta?.PM?.available && !meta?.PM?.waitlist),
+      },
+      {
+        value: "FULL_DAY" as BookingTypeValue,
+        label: meta?.FULL_DAY?.label || "Full Day",
+        isWaitlist: meta?.FULL_DAY?.waitlist || false,
+        isDisabled:
+          !bookingData.date ||
+          (!meta?.FULL_DAY?.available && !meta?.FULL_DAY?.waitlist),
+      },
+    ];
+  }, [selectedDateMeta, bookingData.date]);
 
   const selectedDestinationName = bookingData.destination
     ? destinations.data?.data?.find((d) => d.id === bookingData.destination)
@@ -466,7 +485,6 @@ const bookingTypeCards = useMemo(() => {
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
-    const calendarDay = availabilityDays.find((d) => d.dayOfWeek || d.date);
     const fullDate = new Date(
       calendarMonth.getFullYear(),
       calendarMonth.getMonth(),
@@ -533,47 +551,62 @@ const bookingTypeCards = useMemo(() => {
   };
 
   const selectedBookingTypeMeta = useMemo(() => {
-  if (!selectedDateMeta?.booking_types || !bookingData.bookingType) return null;
+    if (!selectedDateMeta?.booking_types || !bookingData.bookingType) {
+      return null;
+    }
 
-  return selectedDateMeta.booking_types[bookingData.bookingType] || null;
-}, [selectedDateMeta, bookingData.bookingType]);
+    return selectedDateMeta.booking_types[bookingData.bookingType] || null;
+  }, [selectedDateMeta, bookingData.bookingType]);
 
-const isSelectedTypeWaitlist = !!selectedBookingTypeMeta?.waitlist;
-const validateStepOne = () => {
-  if (!bookingData.date || !bookingData.bookingType) {
-    setBookingError("Please fill in all required booking fields.");
-    return false;
-  }
+  const isSelectedTypeWaitlist = !!selectedBookingTypeMeta?.waitlist;
 
-  if (!isSelectedTypeWaitlist && !bookingData.startTime) {
-    setBookingError("Please select a start time.");
-    return false;
-  }
+  const validateStepOne = () => {
+    if (!bookingData.date) {
+      setBookingError("Please select a date.");
+      scrollToField(dateSectionRef);
+      return false;
+    }
 
-  if (!bookingData.memberPhone.trim()) {
-    setBookingError("Please enter contact phone number.");
-    return false;
-  }
+    if (!bookingData.bookingType) {
+      setBookingError("Please select a reservation type.");
+      scrollToField(bookingTypeSectionRef);
+      return false;
+    }
 
-  if (!bookingData.totalPassengers.trim()) {
-    setBookingError("Please enter total number of passengers.");
-    return false;
-  }
+    if (!isSelectedTypeWaitlist && !bookingData.startTime) {
+      setBookingError("Please select a start time.");
+      scrollToField(startTimeSectionRef);
+      return false;
+    }
 
-  const passengerCount = Number(bookingData.totalPassengers);
+    if (!bookingData.memberPhone.trim()) {
+      setBookingError("Please enter contact phone number.");
+      scrollToField(memberPhoneSectionRef);
+      return false;
+    }
 
-  if (!Number.isInteger(passengerCount) || passengerCount < 1) {
-    setBookingError("Total number of passengers must be at least 1.");
-    return false;
-  }
+    if (!bookingData.totalPassengers.trim()) {
+      setBookingError("Please enter total number of passengers.");
+      scrollToField(passengersSectionRef);
+      return false;
+    }
 
-  if (boatCapacity > 0 && passengerCount > boatCapacity) {
-    setBookingError(`Total passengers exceed boat capacity of ${boatCapacity}.`);
-    return false;
-  }
+    const passengerCount = Number(bookingData.totalPassengers);
 
-  return true;
-};
+    if (!Number.isInteger(passengerCount) || passengerCount < 1) {
+      setBookingError("Total number of passengers must be at least 1.");
+      scrollToField(passengersSectionRef);
+      return false;
+    }
+
+    if (boatCapacity > 0 && passengerCount > boatCapacity) {
+      setBookingError(`Total passengers exceed boat capacity of ${boatCapacity}.`);
+      scrollToField(passengersSectionRef);
+      return false;
+    }
+
+    return true;
+  };
 
   const handleContinue = async () => {
     if (step === 1) {
@@ -597,7 +630,7 @@ const validateStepOne = () => {
               fleet_id: boat.id,
               start_date: bookingData.date,
               booking_type: bookingData.bookingType,
-start_time: bookingData.startTime || undefined,
+              start_time: bookingData.startTime || undefined,
               destination: bookingData.destination || undefined,
               customer_notes: bookingData.notes || undefined,
               member_phone: bookingData.memberPhone.trim(),
@@ -688,21 +721,21 @@ start_time: bookingData.startTime || undefined,
                   </span>
                 </div>
 
-            <div className="flex items-center gap-4 flex-wrap">
-  <div className="flex items-center gap-2">
-    <Users className="w-4 h-4 text-gray-500" />
-    <span className="text-gray-600 text-[15px]">
-      {boatCapacity || 0} Guests
-    </span>
-  </div>
+                <div className="flex items-center gap-4 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-600 text-[15px]">
+                      {boatCapacity || 0} Guests
+                    </span>
+                  </div>
 
-  <div className="flex items-center gap-2">
-    <Weight className="w-4 h-4 text-gray-500" />
-    <span className="text-gray-600 text-[15px]">
-      {boatWeightCapacity ? `${boatWeightCapacity} lbs` : "—"}
-    </span>
-  </div>
-</div>
+                  <div className="flex items-center gap-2">
+                    <Weight className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-600 text-[15px]">
+                      {boatWeightCapacity ? `${boatWeightCapacity} lbs` : "—"}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="px-5 md:px-6 py-5">
@@ -718,7 +751,7 @@ start_time: bookingData.startTime || undefined,
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <div className="space-y-2">
+                  <div ref={dateSectionRef} className="space-y-2">
                     <Label className="text-[#171A22] text-[14px] font-semibold">
                       Date *
                     </Label>
@@ -822,9 +855,9 @@ start_time: bookingData.startTime || undefined,
                     )}
                   </div>
 
-                  <div>
+                  <div ref={bookingTypeSectionRef}>
                     <Label className="text-[#171A22] text-[14px] font-semibold mb-3 block">
-                      Reservation Type *
+                      Reservation Type* (Please select one)
                     </Label>
 
                     <div className="space-y-2 mb-2">
@@ -871,12 +904,12 @@ start_time: bookingData.startTime || undefined,
                       </span>
                     </div>
 
-                    <div className="space-y-2">
+                    <div ref={startTimeSectionRef} className="space-y-2">
                       <Label
                         htmlFor="startTime"
                         className="text-[#171A22] text-[14px] font-semibold"
                       >
-                        Start Time 
+                        Start Time
                       </Label>
 
                       {!bookingData.date || !bookingData.bookingType ? (
@@ -912,13 +945,11 @@ start_time: bookingData.startTime || undefined,
                         </Select>
                       )}
                     </div>
-
-                 
                   </div>
                 </div>
 
                 <div className="space-y-5">
-                  <div className="space-y-2">
+                  <div ref={memberPhoneSectionRef} className="space-y-2">
                     <Label
                       htmlFor="memberPhone"
                       className="text-[#171A22] text-[14px] font-semibold"
@@ -942,7 +973,7 @@ start_time: bookingData.startTime || undefined,
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                    <div ref={passengersSectionRef} className="space-y-2">
                       <Label
                         htmlFor="totalPassengers"
                         className="text-[#171A22] text-[14px] font-semibold"

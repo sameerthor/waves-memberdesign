@@ -164,3 +164,9 @@
     pointer-events: all;
   }
 }
+
+
+.calendar-box {
+    padding: 0px !important;
+    border-bottom: 0px !important;
+}

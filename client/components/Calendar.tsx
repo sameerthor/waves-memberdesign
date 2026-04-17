@@ -131,7 +131,7 @@ export default function Calendar({
   });
 
   return (
-    <div className="bg-white rounded-md p-5 border-b border-gray-500/25">
+    <div className="calendar-box bg-white rounded-md p-5 border-b border-gray-500/25">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-gray-900 font-semibold text-base">{monthName}</h3>
 

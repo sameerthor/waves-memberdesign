@@ -533,18 +533,7 @@ export default function BoatCard({
           </div>
         </div>
 
-        {features.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            {features.map((feature) => (
-              <span
-                key={feature}
-                className="px-2 py-1 rounded-lg bg-gray-200 text-gray-900 text-xs"
-              >
-                {feature}
-              </span>
-            ))}
-          </div>
-        )}
+ 
 
         <div className="flex flex-col sm:flex-row gap-3 mt-auto items-center justify-between">
           <div className="flex flex-col gap-1 px-4 w-full sm:w-auto">

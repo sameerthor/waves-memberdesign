@@ -54,7 +54,7 @@ export default function BoatDetailModal({
   if (!isOpen) return null;
 
   const handleSelectBoat = () => {
-    navigate("/reservation", {
+    navigate("/reserve", {
       state: {
         boat,
         selectedDate,

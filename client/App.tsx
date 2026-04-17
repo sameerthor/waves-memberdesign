@@ -58,7 +58,7 @@ const App = () => (
               }
             />
             <Route
-              path="/reservation"
+              path="/reserve"
               element={
                 <ProtectedRoute>
                   <BookingFlow />

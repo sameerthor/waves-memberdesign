@@ -170,7 +170,7 @@ const [selectedDate, setSelectedDate] = useState<string | null>(getTodayDate());
   };
 
   const handleDirectSelectBoat = (boat: any) => {
-    navigate("/reservation", {
+    navigate("/reserve", {
       state: {
         boat,
         selectedDate,
