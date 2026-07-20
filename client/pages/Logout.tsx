@@ -2,21 +2,33 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { apiCall } from "@/utils/api";
 
 export default function Logout() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
   useEffect(() => {
-    // Perform logout
-    logout();
+    let cancelled = false;
 
-    // Simulate logout process with delay
-    const timer = setTimeout(() => {
-      navigate("/login");
-    }, 2000);
+    const performLogout = async () => {
+      try {
+        await apiCall("/api/auth/logout", { method: "POST" });
+      } catch {
+        // Clear local session even if the API call fails
+      }
 
-    return () => clearTimeout(timer);
+      if (!cancelled) {
+        logout();
+        navigate("/login");
+      }
+    };
+
+    performLogout();
+
+    return () => {
+      cancelled = true;
+    };
   }, [navigate, logout]);
 
   return (

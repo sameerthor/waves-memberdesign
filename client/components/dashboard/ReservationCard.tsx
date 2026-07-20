@@ -223,7 +223,10 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
       </div>
 
       <div className="relative z-10 flex items-center gap-4 mt-8 flex-wrap">
-        <button className="flex items-center gap-2 px-7 py-3.5 bg-[#3B63FF] hover:bg-blue-700 text-white font-semibold text-[15px] rounded-md transition-colors">
+        <Link
+          to="/my-reservations"
+          className="flex items-center gap-2 px-7 py-3.5 bg-[#3B63FF] hover:bg-blue-700 text-white font-semibold text-[15px] rounded-md transition-colors"
+        >
           View Reservation
           <svg
             width="16"
@@ -240,7 +243,7 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
               strokeLinejoin="round"
             />
           </svg>
-        </button>
+        </Link>
 
         <button className="px-5 py-3.5 text-gray-500 hover:text-gray-700 font-medium text-[15px] transition-colors">
           Modify Booking

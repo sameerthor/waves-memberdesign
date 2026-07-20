@@ -4,6 +4,8 @@ interface UsageStatsProps {
     hours_this_month_subtitle: string;
     upcoming_hours: number;
     upcoming_hours_subtitle: string;
+    reservations_this_month?: number;
+    reservations_this_month_subtitle?: string;
     lifetime_trips: number;
     lifetime_trips_subtitle: string;
   };
@@ -40,7 +42,14 @@ export default function UsageStats({ stats }: UsageStatsProps) {
 
   return (
     <div className="flex flex-row lg:flex-col gap-4 w-full lg:w-[320px] xl:w-[376px] flex-shrink-0">
-      
+      <StatCard
+        label="Reservations This Month"
+        value={(stats.reservations_this_month ?? 0).toString()}
+        subtitle={
+          stats.reservations_this_month_subtitle || stats.hours_this_month_subtitle || "—"
+        }
+      />
+
       <StatCard
         label="Hours This Month"
         value={formatNumber(stats.hours_this_month)}
@@ -58,7 +67,6 @@ export default function UsageStats({ stats }: UsageStatsProps) {
         value={(stats.lifetime_trips ?? 0).toString()}
         subtitle={stats.lifetime_trips_subtitle || "—"}
       />
-
     </div>
   );
 }

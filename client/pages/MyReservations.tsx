@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { apiCall } from "@/utils/api";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 // ── Types ───────────────────────────────────────────────────────────────────
 
 type Tab = "upcoming" | "history" | "cancelled";
@@ -136,28 +136,6 @@ interface EditFormState {
 }
 
 // ── API helpers ─────────────────────────────────────────────────────────────
-
-async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem("accessToken");
-
-  const response = await fetch(API_BASE_URL + url, {
-    ...options,
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-  });
-
-  const json = await response.json();
-
-  if (!response.ok) {
-    throw new Error(json?.message || "Something went wrong.");
-  }
-
-  return json as T;
-}
 
 function getEditMetaUrl(
   reservationId: number,
@@ -456,7 +434,7 @@ function ViewReservationModal({
     queryKey: ["my-trip-detail", reservationId],
     enabled: open && !!reservationId,
     queryFn: () =>
-      apiFetch<ReservationDetailResponse>(`/api/my-trips/${reservationId}`),
+      apiCall<ReservationDetailResponse>(`/api/my-trips/${reservationId}`),
   });
 
   const reservation = detailQuery.data?.data;
@@ -633,7 +611,7 @@ function EditReservationModal({
     ],
     enabled: open && !!reservation?.id,
     queryFn: () =>
-      apiFetch<EditMetaResponse>(
+      apiCall<EditMetaResponse>(
         getEditMetaUrl(reservation!.id, {
           date: form.start_date || undefined,
           booking_type: form.booking_type || undefined,
@@ -644,12 +622,12 @@ function EditReservationModal({
   const destinationsQuery = useQuery({
     queryKey: ["reservation-destinations"],
     enabled: open,
-    queryFn: () => apiFetch<DestinationsResponse>("/api/reservations/destinations"),
+    queryFn: () => apiCall<DestinationsResponse>("/api/reservations/destinations"),
   });
 
   const updateMutation = useMutation({
     mutationFn: () =>
-      apiFetch<ReservationDetailResponse>(`/api/my-trips/${reservation!.id}`, {
+      apiCall<ReservationDetailResponse>(`/api/my-trips/${reservation!.id}`, {
         method: "PUT",
         body: JSON.stringify({
           start_date: form.start_date,
@@ -1036,12 +1014,12 @@ export default function MyTrips() {
 
   const tripsQuery = useQuery({
     queryKey: ["my-trips"],
-    queryFn: () => apiFetch<TripsResponse>("/api/my-trips"),
+    queryFn: () => apiCall<TripsResponse>("/api/my-trips"),
   });
 
   const cancelMutation = useMutation({
     mutationFn: (reservationId: number) =>
-      apiFetch<{ success: boolean; message: string }>(
+      apiCall<{ success: boolean; message: string }>(
         `/api/my-trips/${reservationId}/cancel`,
         {
           method: "PATCH",

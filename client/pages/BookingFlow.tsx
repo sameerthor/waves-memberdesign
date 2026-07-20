@@ -23,8 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { apiCall } from "@/utils/api";
 
 interface Boat {
   id: number;
@@ -161,28 +160,6 @@ function formatPhoneCapacityText(capacity: number) {
   return `${capacity} Guests (Maximum Capacity)`;
 }
 
-async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem("accessToken");
-
-  const response = await fetch(API_BASE_URL + url, {
-    ...options,
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
-    },
-  });
-
-  const json = await response.json();
-
-  if (!response.ok) {
-    throw new Error(json?.message || "Something went wrong.");
-  }
-
-  return json as T;
-}
-
 function useAsyncData<T>(
   enabled: boolean,
   key: string,
@@ -311,20 +288,20 @@ export default function BookingFlow() {
   const bookingMeta = useAsyncData<BookingMetaResponse>(
     true,
     "booking-meta",
-    () => apiFetch("/api/reservations/booking-meta"),
+    () => apiCall("/api/reservations/booking-meta"),
   );
 
   const availableDates = useAsyncData<AvailableDatesResponse>(
     !!boat.id,
     `available-dates-${boat.id}`,
-    () => apiFetch(`/api/reservations/available-dates?fleet_id=${boat.id}`),
+    () => apiCall(`/api/reservations/available-dates?fleet_id=${boat.id}`),
   );
 
   const availableTimes = useAsyncData<AvailableTimesResponse>(
     !!boat.id && !!bookingData.date && !!bookingData.bookingType,
     `available-times-${boat.id}-${bookingData.date}-${bookingData.bookingType}`,
     () =>
-      apiFetch(
+      apiCall(
         `/api/reservations/available-times?fleet_id=${boat.id}&date=${bookingData.date}&booking_type=${bookingData.bookingType}`,
       ),
   );
@@ -332,7 +309,7 @@ export default function BookingFlow() {
   const destinations = useAsyncData<DestinationsResponse>(
     true,
     "destinations",
-    () => apiFetch("/api/reservations/destinations"),
+    () => apiCall("/api/reservations/destinations"),
   );
 
   useEffect(() => {
@@ -363,7 +340,7 @@ export default function BookingFlow() {
   }, [bookingData.date]);
 
   const fetchCreatedReservation = async (reservationId: number) => {
-    const data = await apiFetch<ReservationResponse>(
+    const data = await apiCall<ReservationResponse>(
       `/api/reservations/${reservationId}`,
     );
     setCreatedReservation(data.data);
@@ -622,7 +599,7 @@ export default function BookingFlow() {
         setIsSubmitting(true);
         setBookingError(null);
 
-        const response = await apiFetch<ReservationResponse>(
+        const response = await apiCall<ReservationResponse>(
           "/api/reservations",
           {
             method: "POST",

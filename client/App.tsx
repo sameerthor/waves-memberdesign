@@ -16,6 +16,8 @@ import BookingFlow from "./pages/BookingFlow";
 import Search from "./pages/Search";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Logout from "./pages/Logout";
 import Placeholder from "./pages/Placeholder";
 import Billing from "./pages/Billing";
@@ -36,6 +38,8 @@ const App = () => (
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Root Route - Conditional: Welcome if not logged in, Search if logged in */}
             <Route path="/" element={<RootPage />} />
