@@ -50,12 +50,27 @@ export default function Header() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const getInitials = (email: string) =>
-    email.split("@")[0]
-      .split(".")
-      .map((p) => p[0]?.toUpperCase() ?? "")
-      .join("")
-      .slice(0, 2);
+  const getInitials = () => {
+    const email = user?.email?.trim();
+    if (email) {
+      const fromEmail = email
+        .split("@")[0]
+        .split(".")
+        .map((p) => p[0]?.toUpperCase() ?? "")
+        .join("")
+        .slice(0, 2);
+
+      if (fromEmail) {
+        return fromEmail;
+      }
+    }
+
+    const first = user?.profile?.first_name?.[0] ?? "";
+    const last = user?.profile?.last_name?.[0] ?? "";
+    const fromName = `${first}${last}`.toUpperCase();
+
+    return fromName || "M";
+  };
 
   const handleLogout = () => {
     logout();
@@ -102,7 +117,7 @@ export default function Header() {
             <PlatinumBadge />
             <div className="w-px h-6 bg-black/[0.08]" />
             <div className="flex items-center gap-3">
-              <AvatarCircle initials={getInitials(user.email)} />
+              <AvatarCircle initials={getInitials()} />
               <button
                 onClick={handleLogout}
                 className="hidden md:block text-sm font-medium text-red-600 hover:text-red-700"

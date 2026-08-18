@@ -19,7 +19,7 @@ type LoginTab = "password" | "otp";
 
 interface AuthUserPayload {
   id: number;
-  email: string;
+  email: string | null;
   first_name?: string;
   last_name?: string;
 }

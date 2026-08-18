@@ -3,7 +3,7 @@ import { MemberProfile } from "@shared/types";
 
 interface User {
   id: string;
-  email: string;
+  email: string | null;
   loginMethod: "otp" | "password";
   profile?: MemberProfile; // Full profile from login response
 }

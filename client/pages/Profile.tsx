@@ -274,7 +274,7 @@ export default function Profile() {
                   className="flex items-center gap-2 text-gray-900 text-sm"
                 >
                   <Phone className="w-4 h-4" />
-                  Phone Number <span className="text-red-500">*</span>
+                  Phone Number
                 </Label>
                 <Input
                   id="phone"
@@ -285,7 +285,6 @@ export default function Profile() {
                   }
                   placeholder="+1 (555) 000-0000"
                   className="bg-gray-50 border-gray-300"
-                  required
                   disabled={isSaving}
                 />
               </div>

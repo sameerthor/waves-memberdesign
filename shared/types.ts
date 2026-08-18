@@ -9,8 +9,8 @@ export interface MemberProfile {
   /* Personal Information */
   first_name: string;
   last_name: string;
-  email: string;
-  phone: string;
+  email: string | null;
+  phone: string | null;
   date_of_birth: string | null;
   gender: string | null;
 

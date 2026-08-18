@@ -31,8 +31,8 @@ interface DashboardData {
     first_name: string;
     last_name: string;
     display_name?: string;
-    email: string;
-    phone: string;
+    email: string | null;
+    phone: string | null;
     membership_type: string;
     member_since: string | null;
     membership_renews_at: string | null;
