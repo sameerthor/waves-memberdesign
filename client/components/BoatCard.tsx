@@ -165,7 +165,6 @@ export default function BoatCard({
   onSelectBoat,
   onViewBoat,
 }: BoatCardProps) {
-  console.log("availability",availability)
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
 
   const galleryImages = useMemo(() => {
@@ -200,6 +199,10 @@ export default function BoatCard({
 
   const amPill = getAvailabilityPill("AM", availability?.AM);
   const pmPill = getAvailabilityPill("PM", availability?.PM);
+  const isWaitlistOnly =
+    !!availability &&
+    !availability.AM?.available &&
+    !availability.PM?.available;
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col lg:flex-row gap-5 p-5 relative">
@@ -546,10 +549,14 @@ export default function BoatCard({
           <div className="flex w-full sm:w-auto gap-3">
             <button
               onClick={onSelectBoat}
-              className="flex-1 sm:flex-none sm:min-w-[180px] py-3 px-4 bg-blue-primary text-white font-semibold text-base rounded-md hover:bg-blue-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`flex-1 sm:flex-none sm:min-w-[180px] py-3 px-4 font-semibold text-base rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                isWaitlistOnly
+                  ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  : "bg-blue-primary text-white hover:bg-blue-primary/90"
+              }`}
               disabled={badge === "unavailable"}
             >
-              Reserve
+              {isWaitlistOnly ? "Waitlist" : "Reserve"}
             </button>
           </div>
         </div>
