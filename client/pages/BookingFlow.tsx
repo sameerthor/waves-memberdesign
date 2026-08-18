@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { apiCall } from "@/utils/api";
+import { useAuth } from "@/context/AuthContext";
+import { formatMembershipType } from "@/utils/formatMembershipType";
 
 interface Boat {
   id: number;
@@ -204,6 +206,8 @@ function useAsyncData<T>(
 export default function BookingFlow() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+  const membershipLabel = formatMembershipType(user?.profile?.membership_type);
 
   const bookingState = location.state as
     | {
@@ -1196,7 +1200,7 @@ export default function BookingFlow() {
                   </svg>
                   <div className="flex-1">
                     <h4 className="text-[#171A22] text-sm font-semibold mb-1">
-                      Gold Membership
+                      {membershipLabel ? `${membershipLabel} Membership` : "Membership"}
                     </h4>
                     <p className="text-gray-600 text-xs">
                       Included with Membership

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fetchProfile, saveProfile } from "@/utils/api";
 import { isProfileComplete } from "@/utils/profileValidation";
+import { formatMembershipType } from "@/utils/formatMembershipType";
 import { MemberProfile, UpdateProfileRequest, SaveProfileResponse } from "@shared/types";
 
 export default function Profile() {
@@ -570,8 +571,8 @@ export default function Profile() {
                   <Label className="text-gray-900 text-sm font-medium">
                     Membership Type
                   </Label>
-                  <div className="px-3 py-2 bg-gray-100 rounded-md text-gray-900 text-sm capitalize">
-                    {formData.membership_type || "—"}
+                  <div className="px-3 py-2 bg-gray-100 rounded-md text-gray-900 text-sm">
+                    {formatMembershipType(formData.membership_type) || "—"}
                   </div>
                 </div>
 
