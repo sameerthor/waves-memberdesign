@@ -48,7 +48,9 @@ interface ReservationItem {
     name: string | null;
     image_url: string | null;
     dock_location: string | null;
+    capacity?: number | null;
   };
+  total_passengers?: number | null;
   location: string | null;
   destination: string | null;
   start_date: string | null;
@@ -104,6 +106,8 @@ interface EditMetaResponse {
     due_time: string | null;
     due_time_formatted?: string | null;
     is_waitlist?: boolean;
+    total_passengers?: number | null;
+    fleet_capacity?: number | null;
     time_slots: Array<{
       time: string;
       label: string;
@@ -133,6 +137,7 @@ interface EditFormState {
   start_time: string;
   destination: string;
   customer_notes: string;
+  total_passengers: string;
 }
 
 // ── API helpers ─────────────────────────────────────────────────────────────
@@ -516,6 +521,16 @@ function ViewReservationModal({
             </div>
             <div className="rounded-lg border border-black/[0.08] p-4">
               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                Passengers
+              </div>
+              <div className="text-sm font-semibold text-gray-900">
+                {reservation.total_passengers != null
+                  ? reservation.total_passengers
+                  : "—"}
+              </div>
+            </div>
+            <div className="rounded-lg border border-black/[0.08] p-4">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                 Fuel Charge
               </div>
               <div className="text-sm font-semibold text-gray-900">
@@ -585,6 +600,7 @@ function EditReservationModal({
     start_time: "",
     destination: "",
     customer_notes: "",
+    total_passengers: "",
   });
 
   const [error, setError] = useState("");
@@ -597,7 +613,11 @@ function EditReservationModal({
       booking_type: reservation.booking_type || "",
       start_time: reservation.start_time || "",
       destination: reservation.destination || "",
-      customer_notes: (reservation as any).customer_notes || ""
+      customer_notes: (reservation as any).customer_notes || "",
+      total_passengers:
+        reservation.total_passengers != null
+          ? String(reservation.total_passengers)
+          : "",
     });
     setError("");
   }, [reservation, open]);
@@ -635,6 +655,7 @@ function EditReservationModal({
           start_time: form.start_time || undefined,
           destination: form.destination || null,
           customer_notes: form.customer_notes || null,
+          total_passengers: Number(form.total_passengers),
         }),
       }),
     onSuccess: () => {
@@ -673,6 +694,9 @@ function EditReservationModal({
   }, [bookingTypes, form.booking_type]);
 
   const isSelectedTypeWaitlist = !!(selectedBookingTypeMeta as any)?.waitlist;
+  const boatCapacity = Number(
+    editMetaQuery.data?.data.fleet_capacity ?? reservation?.boat.capacity ?? 0
+  );
 
   const handleSubmit = () => {
     setError("");
@@ -684,6 +708,23 @@ function EditReservationModal({
 
     if (!isSelectedTypeWaitlist && !form.start_time) {
       setError("Please select a start time.");
+      return;
+    }
+
+    if (!form.total_passengers.trim()) {
+      setError("Please enter total number of passengers.");
+      return;
+    }
+
+    const passengerCount = Number(form.total_passengers);
+
+    if (!Number.isInteger(passengerCount) || passengerCount < 1) {
+      setError("Total number of passengers must be at least 1.");
+      return;
+    }
+
+    if (boatCapacity > 0 && passengerCount > boatCapacity) {
+      setError(`Total passengers exceed boat capacity of ${boatCapacity}.`);
       return;
     }
 
@@ -824,6 +865,26 @@ function EditReservationModal({
           </div>
 
           <div className="space-y-2">
+            <Label className="text-gray-900 text-sm">Total Number of Passengers *</Label>
+            {boatCapacity > 0 ? (
+              <p className="text-gray-500 text-[12px]">
+                {boatCapacity} Guests (Maximum Capacity)
+              </p>
+            ) : null}
+            <input
+              type="number"
+              min={1}
+              max={boatCapacity > 0 ? boatCapacity : undefined}
+              value={form.total_passengers}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, total_passengers: e.target.value }))
+              }
+              className="w-full h-10 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 outline-none focus:border-blue-500"
+              placeholder="4"
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label className="text-gray-900 text-sm">Notes</Label>
             <Textarea
               value={form.customer_notes}
@@ -927,6 +988,14 @@ function ReservationCard({
             <InfoField
               label="Duration"
               value={reservation.duration_label || "—"}
+            />
+            <InfoField
+              label="Passengers"
+              value={
+                reservation.total_passengers != null
+                  ? String(reservation.total_passengers)
+                  : "—"
+              }
             />
           </div>
         </div>
