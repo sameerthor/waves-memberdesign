@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { fetchProfile, saveProfile } from "@/utils/api";
 import { isProfileComplete } from "@/utils/profileValidation";
 import { formatMembershipType } from "@/utils/formatMembershipType";
+import { formatMembershipNumber } from "@/utils/formatMembershipNumber";
 import { MemberProfile, UpdateProfileRequest, SaveProfileResponse } from "@shared/types";
 
 export default function Profile() {
@@ -567,6 +568,19 @@ export default function Profile() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-900 text-sm font-medium">
+                    Member ID
+                  </Label>
+                  <div className="px-3 py-2 bg-gray-100 rounded-md text-gray-900 text-sm font-semibold">
+                    {formData.membership_number_display ||
+                      formatMembershipNumber(
+                        formData.membership_number,
+                        formData.id,
+                      )}
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label className="text-gray-900 text-sm font-medium">
                     Membership Type

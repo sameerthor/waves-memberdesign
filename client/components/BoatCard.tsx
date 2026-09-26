@@ -67,21 +67,13 @@ function formatFuelCapacity(fuelCapacity?: string | number | null) {
   return `${fuelCapacity} gal`;
 }
 
-function formatWeightCapacity(
-  weightCapacity?: string | number | null,
-  guests?: number | null,
-) {
-  const guestsText = guests ? `${guests} Guests` : "—";
-
-  if (
-    weightCapacity === null ||
-    weightCapacity === undefined ||
-    weightCapacity === ""
-  ) {
-    return guestsText;
+function formatMaxCapacity(guests?: number | null) {
+  const n = Number(guests ?? 0);
+  if (!Number.isFinite(n) || n <= 0) {
+    return "—";
   }
 
-  return `${guestsText} / ${weightCapacity} lbs`;
+  return `Maximum Capacity - ${n}`;
 }
 
 function formatLastBooked(
@@ -180,7 +172,7 @@ export default function BoatCard({
   const safeLength = formatLength(length);
   const safeGuests = Number(guests ?? 0);
   const safeFuelCapacity = formatFuelCapacity(fuelCapacity);
-  const safeCapacityText = formatWeightCapacity(weightCapacity, safeGuests);
+  const safeCapacityText = formatMaxCapacity(safeGuests);
   const safeMotor = motor || "—";
   const safeNotes = notes || boatAddress || "No notes available";
   const safeLastBooked = formatLastBooked(lastBookedFormatted, lastBooked);

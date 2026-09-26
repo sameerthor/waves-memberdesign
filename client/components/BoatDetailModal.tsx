@@ -121,7 +121,7 @@ export default function BoatDetailModal({
             {boat.includedWithMembership && (
               <div className="px-2 py-1 rounded-lg border border-blue-primary/64 bg-blue-primary/11">
                 <span className="text-blue-primary text-xs">
-                  Member Booking - No Charge
+                  Included with Membership
                 </span>
               </div>
             )}

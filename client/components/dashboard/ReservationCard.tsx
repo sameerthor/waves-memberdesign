@@ -86,8 +86,14 @@ export default function ReservationCard({ reservation }: ReservationCardProps) {
     );
   }
 
-  const statusText = reservation.status || "Pending";
-  const normalizedStatus = statusText.toLowerCase();
+  const rawStatus = (reservation.status || "pending").toLowerCase();
+  const statusText =
+    rawStatus === "pending"
+      ? "Waitlisted"
+      : reservation.status
+        ? reservation.status.charAt(0).toUpperCase() + reservation.status.slice(1).toLowerCase()
+        : "Waitlisted";
+  const normalizedStatus = rawStatus;
 
   const badgeClasses =
     normalizedStatus === "confirmed"

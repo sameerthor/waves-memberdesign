@@ -7,13 +7,13 @@ import BoatDetailModal from "@/components/BoatDetailModal";
 import { useBoats } from "@/hooks/useBoats";
 import { BoatFilters } from "@/utils/api";
 import { Button } from "@/components/ui/button";
+import {
+  formatDateLongForDisplay,
+  getTodayLocalDate,
+} from "@/utils/dateHelper";
 
 const MIN_LENGTH = 16;
 const MAX_LENGTH = 100;
-
-const getTodayDate = () => {
-  return new Date().toISOString().split("T")[0];
-};
 
 type SortOption =
   | "Recommended"
@@ -38,7 +38,7 @@ export default function BrowseBoats() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
-const [selectedDate, setSelectedDate] = useState<string | null>(getTodayDate());
+const [selectedDate, setSelectedDate] = useState<string | null>(getTodayLocalDate());
   const [slot, setSlot] = useState<string | null>(null);
   const [locations, setLocations] = useState<string[]>([]);
   const [boatTypes, setBoatTypes] = useState<string[]>([]);
@@ -186,7 +186,7 @@ const [selectedDate, setSelectedDate] = useState<string | null>(getTodayDate());
 
   const handleResetFilters = () => {
     setSearchQuery("");
-setSelectedDate(getTodayDate());
+setSelectedDate(getTodayLocalDate());
     setSlot(null);
     setLocations([]);
     setBoatTypes([]);
@@ -203,15 +203,7 @@ setSelectedDate(getTodayDate());
 
   const formatDateDisplay = (dateString: string | null) => {
     if (!dateString) return "Select a date";
-
-    const date = new Date(dateString);
-
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
+    return formatDateLongForDisplay(dateString);
   };
 
   return (

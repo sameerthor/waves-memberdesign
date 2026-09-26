@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
 import {
   MapPin,
-  Weight,
   Users,
   Info,
   CheckCircle2,
@@ -159,7 +158,7 @@ function toApiDate(date: Date) {
 }
 
 function formatPhoneCapacityText(capacity: number) {
-  return `${capacity} Guests (Maximum Capacity)`;
+  return `Maximum Capacity - ${capacity}`;
 }
 
 function useAsyncData<T>(
@@ -287,7 +286,6 @@ export default function BookingFlow() {
   const boatImage = boat.images?.[0] || boat.image || "";
   const boatLocation = boat.location || "Location unavailable";
   const boatCapacity = Number(boat.guests ?? boat.capacity ?? 0);
-  const boatWeightCapacity = boat.weightCapacity ?? null;
 
   const bookingMeta = useAsyncData<BookingMetaResponse>(
     true,
@@ -706,14 +704,7 @@ export default function BookingFlow() {
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-600 text-[15px]">
-                      {boatCapacity || 0} Guests
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Weight className="w-4 h-4 text-gray-500" />
-                    <span className="text-gray-600 text-[15px]">
-                      {boatWeightCapacity ? `${boatWeightCapacity} lbs` : "—"}
+                      Maximum Capacity - {boatCapacity || 0}
                     </span>
                   </div>
                 </div>
@@ -1077,7 +1068,7 @@ export default function BookingFlow() {
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4 text-gray-500" />
                   <span className="text-gray-600 text-[15px]">
-                    {boatCapacity || 0} Guests
+                    Maximum Capacity - {boatCapacity || 0}
                   </span>
                 </div>
               </div>
@@ -1096,7 +1087,7 @@ export default function BookingFlow() {
                       </p>
                       <p className="text-gray-600 text-sm">
                         This slot type is already reserved. Your booking will be
-                        submitted to the waitlist and saved as pending.
+                        submitted to the waitlist.
                       </p>
                     </div>
                   </div>
@@ -1179,7 +1170,7 @@ export default function BookingFlow() {
                           : "bg-green-100 border-green-300 text-green-800",
                       )}
                     >
-                      {isWaitlistSelected ? "Pending Waitlist" : "Confirmed"}
+                      {isWaitlistSelected ? "Waitlisted" : "Confirmed"}
                     </span>
                   </div>
                 </div>
@@ -1206,9 +1197,6 @@ export default function BookingFlow() {
                       Included with Membership
                     </p>
                   </div>
-                  <span className="px-2 py-1 rounded-md bg-green-50 border border-green-200 text-green-700 text-xs font-medium">
-                    No Charge
-                  </span>
                 </div>
 
                 <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg mb-5">
@@ -1417,12 +1405,12 @@ export default function BookingFlow() {
                               : "bg-green-100 border-green-300 text-green-800",
                           )}
                         >
-                          {createdReservation.status
-                            ? createdReservation.status
-                                .charAt(0)
-                                .toUpperCase() +
-                              createdReservation.status.slice(1)
-                            : "Pending"}
+                          {createdReservation.status === "pending"
+                            ? "Waitlisted"
+                            : createdReservation.status
+                              ? createdReservation.status.charAt(0).toUpperCase() +
+                                createdReservation.status.slice(1)
+                              : "Waitlisted"}
                         </span>
                       </div>
                     </div>

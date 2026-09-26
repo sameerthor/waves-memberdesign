@@ -868,7 +868,7 @@ function EditReservationModal({
             <Label className="text-gray-900 text-sm">Total Number of Passengers *</Label>
             {boatCapacity > 0 ? (
               <p className="text-gray-500 text-[12px]">
-                {boatCapacity} Guests (Maximum Capacity)
+                Maximum Capacity - {boatCapacity}
               </p>
             ) : null}
             <input

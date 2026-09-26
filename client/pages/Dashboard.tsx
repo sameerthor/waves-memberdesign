@@ -6,6 +6,7 @@ import QuickActions from "@/components/dashboard/QuickActions";
 import FinancialOverview from "@/components/dashboard/FinancialOverview";
 import RecentActivities from "@/components/dashboard/RecentActivities";
 import { apiCall } from "@/utils/api";
+import { formatMembershipNumber } from "@/utils/formatMembershipNumber";
 
 interface DashboardReservation {
   id: number;
@@ -27,6 +28,8 @@ interface DashboardReservation {
 interface DashboardData {
   user: {
     id: number;
+    membership_number?: string | null;
+    membership_number_display?: string | null;
     name: string;
     first_name: string;
     last_name: string;
@@ -194,20 +197,32 @@ export default function Dashboard() {
             <p className="text-base text-gray-500">{dashboard.welcome.message}</p>
           </div>
 
-          <p className="text-[13px] text-gray-500 sm:text-right whitespace-nowrap">
-            Membership renews{" "}
-            <span className="font-semibold text-gray-900">
-              {dashboard.user.membership_renews_at
-                ? new Date(dashboard.user.membership_renews_at).toLocaleDateString(
-                    "en-US",
-                    {
-                      month: "short",
-                      year: "numeric",
-                    },
-                  )
-                : "N/A"}
-            </span>
-          </p>
+          <div className="flex flex-col gap-1 sm:items-end sm:text-right">
+            <p className="text-[13px] text-gray-500 whitespace-nowrap">
+              Member ID{" "}
+              <span className="font-semibold text-gray-900">
+                {dashboard.user.membership_number_display ||
+                  formatMembershipNumber(
+                    dashboard.user.membership_number,
+                    dashboard.user.id,
+                  )}
+              </span>
+            </p>
+            <p className="text-[13px] text-gray-500 whitespace-nowrap">
+              Membership renews{" "}
+              <span className="font-semibold text-gray-900">
+                {dashboard.user.membership_renews_at
+                  ? new Date(dashboard.user.membership_renews_at).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        year: "numeric",
+                      },
+                    )
+                  : "N/A"}
+              </span>
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">

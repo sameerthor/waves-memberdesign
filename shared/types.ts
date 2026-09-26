@@ -5,6 +5,8 @@
 
 export interface MemberProfile {
   id: number;
+  membership_number?: string | null;
+  membership_number_display?: string | null;
 
   /* Personal Information */
   first_name: string;

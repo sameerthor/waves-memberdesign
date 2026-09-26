@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { formatMembershipType } from "@/utils/formatMembershipType";
+import { formatMembershipNumber } from "@/utils/formatMembershipNumber";
 
 const NAV_LINKS = [
   { label: "Dashboard", href: "/dashboard" },
@@ -51,6 +52,9 @@ export default function Header() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const membershipLabel = formatMembershipType(user?.profile?.membership_type);
+  const memberIdLabel =
+    user?.profile?.membership_number_display ||
+    formatMembershipNumber(user?.profile?.membership_number, user?.profile?.id);
 
   const getInitials = () => {
     const email = user?.email?.trim();
@@ -120,6 +124,12 @@ export default function Header() {
             <div className="w-px h-6 bg-black/[0.08]" />
             <div className="flex items-center gap-3">
               <AvatarCircle initials={getInitials()} />
+              <div className="hidden md:flex flex-col leading-tight">
+                <span className="text-xs text-gray-500">Member ID</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {memberIdLabel}
+                </span>
+              </div>
               <button
                 onClick={handleLogout}
                 className="hidden md:block text-sm font-medium text-red-600 hover:text-red-700"
