@@ -4,7 +4,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import BoatCard from "@/components/BoatCard";
 import FiltersSidebar from "@/components/FiltersSidebar";
 import BoatDetailModal from "@/components/BoatDetailModal";
-import { useBoats } from "@/hooks/useBoats";
+import { useInfiniteBoats } from "@/hooks/useInfiniteBoats";
 import { BoatFilters } from "@/utils/api";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,11 +34,15 @@ export default function BrowseBoats() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
   const [selectedBoat, setSelectedBoat] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
-const [selectedDate, setSelectedDate] = useState<string | null>(getTodayLocalDate());
+  const [selectedDate, setSelectedDate] = useState<string | null>(
+    getTodayLocalDate(),
+  );
   const [slot, setSlot] = useState<string | null>(null);
   const [locations, setLocations] = useState<string[]>([]);
   const [boatTypes, setBoatTypes] = useState<string[]>([]);
@@ -75,7 +79,7 @@ const [selectedDate, setSelectedDate] = useState<string | null>(getTodayLocalDat
       }
 
       if (urlSlot) {
-        setSlot(urlSlot);
+        setSlot(urlSlot.toUpperCase().replace("-", "_"));
       }
     } else {
       setHasSearchParams(false);
@@ -160,9 +164,41 @@ const [selectedDate, setSelectedDate] = useState<string | null>(getTodayLocalDat
     ],
   );
 
-  const { data: boatsResponse, isLoading, error } = useBoats(filters);
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteBoats(filters);
 
-  const boats = boatsResponse?.data || [];
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      {
+        threshold: 0.5,
+      },
+    );
+
+    const currentRef = loadMoreRef.current;
+
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const boats = data?.pages.flatMap((page) => page.data) ?? [];
 
   const handleViewBoat = (boat: any) => {
     setSelectedBoat(boat);
@@ -186,7 +222,7 @@ const [selectedDate, setSelectedDate] = useState<string | null>(getTodayLocalDat
 
   const handleResetFilters = () => {
     setSearchQuery("");
-setSelectedDate(getTodayLocalDate());
+    setSelectedDate(getTodayLocalDate());
     setSlot(null);
     setLocations([]);
     setBoatTypes([]);
@@ -206,6 +242,8 @@ setSelectedDate(getTodayLocalDate());
     return formatDateLongForDisplay(dateString);
   };
 
+  console.log("Selected slot:", slot);
+
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-10 py-5 flex flex-col lg:flex-row gap-5 lg:gap-10">
@@ -221,6 +259,8 @@ setSelectedDate(getTodayLocalDate());
             onLengthChange={setLengthRange}
             selectedFeatures={selectedFeatures}
             onFeaturesChange={setSelectedFeatures}
+            selectedSlot={slot}
+            onSlotChange={setSlot}
           />
         </div>
 
@@ -333,51 +373,46 @@ setSelectedDate(getTodayLocalDate());
           {!isLoading && boats.length > 0 && (
             <div className="flex flex-col gap-5">
               {boats.map((boat: any) => (
-<BoatCard
-  key={boat.id}
-  id={boat.id}
-  name={boat.boat_name}
-  type={boat.type}
-  category={boat.category}
-
-  image={boat.image || ""}
-  images={boat.images || []}
-
-  location={boat.location}
-  boatType={boat.boatType}
-
-  length={boat.length}
-  guests={boat.capacity}
-
-  features={boat.features || []}
-
-  pricePerHour={boat.fare}
-
-  badge={boat.badge}
-
-  fuelCapacity={boat.fuelCapacity}
-  weightCapacity={boat.weightCapacity}
-  motor={boat.motor}
-
-  notes={boat.notes}
-  boatAddress={boat.boat_address}
-
-  lastBooked={boat.lastBooked}
-  lastBookedFormatted={boat.lastBookedFormatted}
-
-  availability={boat.availability}
-
-  onViewBoat={() => handleViewBoat(boat)}
-
-  onSelectBoat={() =>
-    handleDirectSelectBoat({
-      ...boat,
-      selectedDate: selectedDate    // 🔥 AM / PM / FULL_DAY
-    })
-  }
-/>
+                <BoatCard
+                  key={boat.id}
+                  id={boat.id}
+                  name={boat.boat_name}
+                  type={boat.type}
+                  category={boat.category}
+                  image={boat.image || ""}
+                  images={boat.images || []}
+                  location={boat.location}
+                  boatType={boat.boatType}
+                  length={boat.length}
+                  guests={boat.capacity}
+                  features={boat.features || []}
+                  pricePerHour={boat.fare}
+                  badge={boat.badge}
+                  fuelCapacity={boat.fuelCapacity}
+                  weightCapacity={boat.weightCapacity}
+                  motor={boat.motor}
+                  notes={boat.notes}
+                  boatAddress={boat.boat_address}
+                  lastBooked={boat.lastBooked}
+                  lastBookedFormatted={boat.lastBookedFormatted}
+                  availability={boat.availability}
+                  onViewBoat={() => handleViewBoat(boat)}
+                  selectedBookingType={slot}
+                  onSelectBoat={() =>
+                    handleDirectSelectBoat({
+                      ...boat,
+                      selectedDate: selectedDate, // 🔥 AM / PM / FULL_DAY
+                    })
+                  }
+                />
               ))}
             </div>
+          )}
+
+          <div ref={loadMoreRef} className="h-10" />
+
+          {isFetchingNextPage && (
+            <div className="text-center py-4">Loading more boats...</div>
           )}
 
           {!isLoading && boats.length === 0 && (

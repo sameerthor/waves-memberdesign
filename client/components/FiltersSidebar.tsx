@@ -2,7 +2,18 @@ import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import Calendar from "./Calendar";
-import { useBoatLocations, useBoatTypes, useBoatFeatures } from "@/hooks/useBoatFilters";
+import {
+  useBoatLocations,
+  useBoatTypes,
+  useBoatFeatures,
+} from "@/hooks/useBoatFilters";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface FiltersSidebarProps {
   selectedDate: string | null;
@@ -15,6 +26,8 @@ interface FiltersSidebarProps {
   onLengthChange: (range: [number, number]) => void;
   selectedFeatures: string[];
   onFeaturesChange: (features: string[]) => void;
+  selectedSlot: string | null;
+  onSlotChange: (slot: string | null) => void;
 }
 
 export default function FiltersSidebar({
@@ -28,6 +41,8 @@ export default function FiltersSidebar({
   onLengthChange,
   selectedFeatures,
   onFeaturesChange,
+  selectedSlot,
+  onSlotChange,
 }: FiltersSidebarProps) {
   // Fetch filter options from API
   const { data: locationsData } = useBoatLocations();
@@ -40,7 +55,7 @@ export default function FiltersSidebar({
 
   const handleLocationToggle = (location: string) => {
     if (selectedLocations.includes(location)) {
-      onLocationsChange(selectedLocations.filter(l => l !== location));
+      onLocationsChange(selectedLocations.filter((l) => l !== location));
     } else {
       onLocationsChange([...selectedLocations, location]);
     }
@@ -48,7 +63,7 @@ export default function FiltersSidebar({
 
   const handleTypeToggle = (type: string) => {
     if (selectedTypes.includes(type)) {
-      onTypesChange(selectedTypes.filter(t => t !== type));
+      onTypesChange(selectedTypes.filter((t) => t !== type));
     } else {
       onTypesChange([...selectedTypes, type]);
     }
@@ -56,7 +71,7 @@ export default function FiltersSidebar({
 
   const handleFeatureToggle = (feature: string) => {
     if (selectedFeatures.includes(feature)) {
-      onFeaturesChange(selectedFeatures.filter(f => f !== feature));
+      onFeaturesChange(selectedFeatures.filter((f) => f !== feature));
     } else {
       onFeaturesChange([...selectedFeatures, feature]);
     }
@@ -72,6 +87,31 @@ export default function FiltersSidebar({
   return (
     <aside className="w-full lg:w-[365px] bg-white rounded-md p-5 lg:p-7 flex flex-col gap-4 h-fit lg:sticky lg:top-5">
       <Calendar selectedDate={selectedDate} onDateChange={onDateChange} />
+
+      {/* Booking Slot */}
+      <div className="pt-4 border-t border-gray-500/25">
+        <h3 className="text-gray-900 font-semibold text-base mb-3">
+          Booking Slot
+        </h3>
+
+        <Select
+          value={selectedSlot || "any"}
+          onValueChange={(value) =>
+            onSlotChange(value === "any" ? null : value)
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Any Slot" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="any">Any Slot</SelectItem>
+            <SelectItem value="AM">AM</SelectItem>
+            <SelectItem value="PM">PM</SelectItem>
+            <SelectItem value="FULL_DAY">Full Day</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {/* Location */}
       <div className="pt-4 border-t border-gray-500/25">
@@ -153,7 +193,9 @@ export default function FiltersSidebar({
       <div className="pt-4 border-t border-gray-500/25">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-gray-900 font-semibold text-base">Boat Length</h3>
-          <span className="text-gray-900 text-sm">{lengthRange[0]}' - {lengthRange[1]}'</span>
+          <span className="text-gray-900 text-sm">
+            {lengthRange[0]}' - {lengthRange[1]}'
+          </span>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between text-xs text-blue-primary">
