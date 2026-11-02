@@ -79,7 +79,7 @@ export default function BrowseBoats() {
       }
 
       if (urlSlot) {
-        setSlot(urlSlot);
+        setSlot(urlSlot.toUpperCase().replace("-", "_"));
       }
     } else {
       setHasSearchParams(false);
@@ -242,6 +242,8 @@ export default function BrowseBoats() {
     return formatDateLongForDisplay(dateString);
   };
 
+  console.log("Selected slot:", slot);
+
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-10 py-5 flex flex-col lg:flex-row gap-5 lg:gap-10">
@@ -257,6 +259,8 @@ export default function BrowseBoats() {
             onLengthChange={setLengthRange}
             selectedFeatures={selectedFeatures}
             onFeaturesChange={setSelectedFeatures}
+            selectedSlot={slot}
+            onSlotChange={setSlot}
           />
         </div>
 
@@ -393,6 +397,7 @@ export default function BrowseBoats() {
                   lastBookedFormatted={boat.lastBookedFormatted}
                   availability={boat.availability}
                   onViewBoat={() => handleViewBoat(boat)}
+                  selectedBookingType={slot}
                   onSelectBoat={() =>
                     handleDirectSelectBoat({
                       ...boat,

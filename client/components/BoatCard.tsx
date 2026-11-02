@@ -42,6 +42,8 @@ interface BoatCardProps {
 
   availability?: BoatAvailability | null;
 
+  selectedBookingType?: string | null;
+
   onSelectBoat?: () => void;
   onViewBoat?: () => void;
 }
@@ -61,7 +63,11 @@ function formatLength(length?: string | number | null) {
 }
 
 function formatFuelCapacity(fuelCapacity?: string | number | null) {
-  if (fuelCapacity === null || fuelCapacity === undefined || fuelCapacity === "") {
+  if (
+    fuelCapacity === null ||
+    fuelCapacity === undefined ||
+    fuelCapacity === ""
+  ) {
     return "—";
   }
   return `${fuelCapacity} gal`;
@@ -156,6 +162,7 @@ export default function BoatCard({
   availability,
   onSelectBoat,
   onViewBoat,
+  selectedBookingType,
 }: BoatCardProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
 
@@ -191,10 +198,19 @@ export default function BoatCard({
 
   const amPill = getAvailabilityPill("AM", availability?.AM);
   const pmPill = getAvailabilityPill("PM", availability?.PM);
-  const isWaitlistOnly =
-    !!availability &&
-    !availability.AM?.available &&
-    !availability.PM?.available;
+
+  const selectedSlotStatus =
+    selectedBookingType === "AM" ||
+    selectedBookingType === "PM" ||
+    selectedBookingType === "FULL_DAY"
+      ? availability?.[selectedBookingType]
+      : undefined;
+
+  const isWaitlistOnly = selectedSlotStatus
+    ? !!selectedSlotStatus.waitlist
+    : !!availability &&
+      !availability.AM?.available &&
+      !availability.PM?.available;
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col lg:flex-row gap-5 p-5 relative">
@@ -269,7 +285,6 @@ export default function BoatCard({
         <div className="flex items-start justify-between mb-2 gap-3 flex-wrap">
           <div>
             <h3 className="text-gray-900 text-[26px] font-semibold">{name}</h3>
-
           </div>
 
           {pricePerHour !== null && pricePerHour !== undefined && (
@@ -308,8 +323,6 @@ export default function BoatCard({
               {safeLocation}
             </span>
           </div>
-
-
         </div>
 
         <div className="flex flex-col xl:flex-row xl:justify-between xl:items-center gap-4 mb-3 mt-3">
@@ -373,7 +386,9 @@ export default function BoatCard({
             <div
               className={`flex items-center gap-1 rounded-[100px] px-2 py-1 ${amPill.className}`}
             >
-              <span className={`font-bold text-[10px] ${amPill.badgeTextClass}`}>
+              <span
+                className={`font-bold text-[10px] ${amPill.badgeTextClass}`}
+              >
                 {amPill.label}
               </span>
               <span className={`font-semibold text-[10px] ${amPill.textClass}`}>
@@ -385,7 +400,9 @@ export default function BoatCard({
             <div
               className={`flex items-center gap-1 rounded-[100px] px-2 py-1 ${pmPill.className}`}
             >
-              <span className={`font-bold text-[10px] ${pmPill.badgeTextClass}`}>
+              <span
+                className={`font-bold text-[10px] ${pmPill.badgeTextClass}`}
+              >
                 {pmPill.label}
               </span>
               <span className={`font-semibold text-[10px] ${pmPill.textClass}`}>
@@ -527,8 +544,6 @@ export default function BoatCard({
             ))}
           </div>
         </div>
-
- 
 
         <div className="flex flex-col sm:flex-row gap-3 mt-auto items-center justify-between">
           <div className="flex flex-col gap-1 px-4 w-full sm:w-auto">
